@@ -26,7 +26,7 @@
 
     <changeSet id="004-create-courier" author="TicBnPickTeam">
         <sqlFile
-                path="db/changelog/create-courier.sql"
+                path="db/changelog/create-deliveryPerson.sql"
                 relativeToChangelogFile="false"/>
     </changeSet>
 
@@ -39,6 +39,36 @@
     <changeSet id="006-create-announcement" author="TicBnPickTeam">
         <sqlFile
                 path="db/changelog/create-announcement.sql"
+                relativeToChangelogFile="false"/>
+    </changeSet>
+
+    <changeSet id="007-create-packet" author="TicBnPickTeam">
+        <sqlFile
+                path="db/changelog/create-packet.sql"
+                relativeToChangelogFile="false"/>
+    </changeSet>
+
+    <changeSet id="008-create-delivery" author="TicBnPickTeam">
+        <sqlFile
+                path="db/changelog/create-delivery.sql"
+                relativeToChangelogFile="false"/>
+    </changeSet>
+
+    <changeSet id="009-create-payment" author="TicBnPickTeam">
+        <sqlFile
+                path="db/changelog/create-payment.sql"
+                relativeToChangelogFile="false"/>
+    </changeSet>
+
+    <changeSet id="010-create-logistics" author="TicBnPickTeam">
+        <sqlFile
+                path="db/changelog/create-logistics.sql"
+                relativeToChangelogFile="false"/>
+    </changeSet>
+
+    <changeSet id="011-create-response" author="TicBnPickTeam">
+        <sqlFile
+                path="db/changelog/create-response.sql"
                 relativeToChangelogFile="false"/>
     </changeSet>
 

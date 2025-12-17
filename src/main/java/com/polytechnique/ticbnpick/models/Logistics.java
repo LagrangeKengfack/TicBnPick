@@ -12,8 +12,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Represents a courier in the system.
- * A courier is a person who can perform deliveries.
+ * Represents a logistics vehicle owned by a courier.
  *
  * @author Kengfack Lagrange
  * @date 17/12/2025
@@ -22,40 +21,35 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
-@Table("couriers")
-public class Courier {
+@Table("logistics")
+public class Logistics {
 
     @Id
     @Column("id")
     private UUID id;
 
     @NotNull
-    @Column("person_id")
-    private UUID person_id;
+    @Column("courier_id")
+    private UUID courier_id;
 
     @NotNull
-    @Column("location")
-    private String location;
+    @Column("plate_number")
+    private String plate_number;
 
     @NotNull
-    @Column("commercial_register")
-    private String commercial_register;
+    @Column("logistics_photo")
+    private String logistics_photo;
 
     @NotNull
-    @Column("commercial_name")
-    private String commercial_name;
+    @Column("logistics_type")
+    private String logistics_type;
 
     @NotNull
-    @Column("taxpayer_number")
-    private String taxpayer_number;
+    @Column("logistics_class")
+    private String logistics_class;
 
-    @NotNull
-    @Column("status")
-    private String status;
-
-    @NotNull
-    @Column("is_active")
-    private Boolean is_active;
+    @Column("rating")
+    private Double rating;
 
     @Column("created_at")
     private Instant created_at;
@@ -63,9 +57,12 @@ public class Courier {
     @Column("updated_at")
     private Instant updated_at;
 
-    @Column("commission_rate")
-    private Double commission_rate;
+    @Column("tank_capacity")
+    private Double tank_capacity;
 
-    @Column("siret")
-    private Double siret;
+    @Column("luggage_max_capacity")
+    private Double luggage_max_capacity;
+
+    @Column("total_seat_number")
+    private Integer total_seat_number;
 }

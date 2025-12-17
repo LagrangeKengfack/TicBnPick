@@ -11,8 +11,8 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Represents a physical address in the system.
- * An address can be associated with clients, couriers or deliveries.
+ * Represents a packet to be delivered.
+ * A packet is associated with an announcement.
  *
  * @author Kengfack Lagrange
  * @date 17/12/2025
@@ -21,28 +21,36 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
-@Table("addresses")
-public class Address {
+@Table("packets")
+public class Packet {
 
     @Id
     @Column("id")
     private UUID id;
 
     @NotNull
-    @Column("street")
-    private String street;
+    @Column("announcement_id")
+    private UUID announcement_id;
 
     @NotNull
-    @Column("city")
-    private String city;
+    @Column("weight")
+    private Double weight;
 
     @NotNull
-    @Column("district")
-    private String district;
+    @Column("height")
+    private Double height;
 
     @NotNull
-    @Column("country")
-    private String country;
+    @Column("width")
+    private Double width;
+
+    @NotNull
+    @Column("length")
+    private Double length;
+
+    @NotNull
+    @Column("fragile")
+    private Boolean fragile;
 
     @Column("description")
     private String description;

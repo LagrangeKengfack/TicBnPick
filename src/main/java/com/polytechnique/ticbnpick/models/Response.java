@@ -1,6 +1,7 @@
 package com.polytechnique.ticbnpick.models;
 
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,8 +12,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Represents a physical address in the system.
- * An address can be associated with clients, couriers or deliveries.
+ * Represents a courier response to an announcement.
  *
  * @author Kengfack Lagrange
  * @date 17/12/2025
@@ -21,29 +21,33 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
-@Table("addresses")
-public class Address {
+@Table("responses")
+public class Response {
 
     @Id
     @Column("id")
     private UUID id;
 
     @NotNull
-    @Column("street")
-    private String street;
+    @Column("announcement_id")
+    private UUID announcement_id;
 
     @NotNull
-    @Column("city")
-    private String city;
+    @Column("courier_id")
+    private UUID courier_id;
 
     @NotNull
-    @Column("district")
-    private String district;
+    @Column("arrival_time")
+    private Instant arrival_time;
 
     @NotNull
-    @Column("country")
-    private String country;
+    @Column("courier_amount")
+    private Double courier_amount;
 
-    @Column("description")
-    private String description;
+    @NotNull
+    @Column("status")
+    private String status;
+
+    @Column("created_at")
+    private Instant created_at;
 }

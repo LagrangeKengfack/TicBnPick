@@ -1,6 +1,7 @@
 package com.polytechnique.ticbnpick.models;
 
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,8 +12,8 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Represents a physical address in the system.
- * An address can be associated with clients, couriers or deliveries.
+ * Represents a payment related to a delivery.
+ * A payment records financial information and payment status.
  *
  * @author Kengfack Lagrange
  * @date 17/12/2025
@@ -21,29 +22,38 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
-@Table("addresses")
-public class Address {
+@Table("payments")
+public class Payment {
 
     @Id
     @Column("id")
     private UUID id;
 
     @NotNull
-    @Column("street")
-    private String street;
+    @Column("delivery_id")
+    private UUID delivery_id;
 
     @NotNull
-    @Column("city")
-    private String city;
+    @Column("amount")
+    private Double amount;
 
     @NotNull
-    @Column("district")
-    private String district;
+    @Column("payment_method")
+    private String payment_method;
 
     @NotNull
-    @Column("country")
-    private String country;
+    @Column("status")
+    private String status;
 
-    @Column("description")
-    private String description;
+    @Column("transaction_reference")
+    private String transaction_reference;
+
+    @Column("paid_at")
+    private Instant paid_at;
+
+    @Column("created_at")
+    private Instant created_at;
+
+    @Column("updated_at")
+    private Instant updated_at;
 }

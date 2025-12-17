@@ -4,7 +4,7 @@ CREATE TABLE couriers (
                           location VARCHAR NOT NULL,
                           commercial_register VARCHAR NOT NULL,
                           commercial_name VARCHAR NOT NULL,
-                          taxpayer_number VARCHAR NOT NULL,
+                          nui VARCHAR NOT NULL,
                           status VARCHAR NOT NULL,
                           is_active BOOLEAN NOT NULL,
                           created_at TIMESTAMP,
