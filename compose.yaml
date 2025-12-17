@@ -2,11 +2,14 @@ services:
   postgres:
     image: postgres:16
     container_name: ticbnpick-postgres
+    env_file:
+      - .env
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
     ports:
       - "5432:5432"
     volumes:
