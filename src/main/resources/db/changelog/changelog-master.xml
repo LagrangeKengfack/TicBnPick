@@ -24,6 +24,23 @@
                 relativeToChangelogFile="false"/>
     </changeSet>
 
+    <changeSet id="004-create-courier" author="TicBnPickTeam">
+        <sqlFile
+                path="db/changelog/create-courier.sql"
+                relativeToChangelogFile="false"/>
+    </changeSet>
+
+    <changeSet id="005-create-address" author="TicBnPickTeam">
+        <sqlFile
+                path="db/changelog/create-address.sql"
+                relativeToChangelogFile="false"/>
+    </changeSet>
+
+    <changeSet id="006-create-announcement" author="TicBnPickTeam">
+        <sqlFile
+                path="db/changelog/create-announcement.sql"
+                relativeToChangelogFile="false"/>
+    </changeSet>
 
 
 </databaseChangeLog>
