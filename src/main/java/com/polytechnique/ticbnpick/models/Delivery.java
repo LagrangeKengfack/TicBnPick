@@ -21,7 +21,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Table("deliveries")
 public class Delivery {
 
@@ -31,60 +30,60 @@ public class Delivery {
 
     @NotNull
     @Column("announcement_id")
-    private UUID announcement_id;
+    private UUID announcementId;
 
     @NotNull
     @Column("packet_id")
-    private UUID packet_id;
+    private UUID packetId;
 
     @NotNull
     @Column("courier_id")
-    private UUID courier_id;
+    private UUID courierId;
 
     @NotNull
     @Column("sender_phone")
-    private String sender_phone;
+    private String senderPhone;
 
     @NotNull
     @Column("receiver_phone")
-    private String receiver_phone;
+    private String receiverPhone;
 
     @NotNull
     @Column("pickup_time_min")
-    private Instant pickup_time_min;
+    private Instant pickupTimeMin;
 
     @NotNull
     @Column("pickup_time_max")
-    private Instant pickup_time_max;
+    private Instant pickupTimeMax;
 
     @NotNull
     @Column("delivery_time_min")
-    private Instant delivery_time_min;
+    private Instant deliveryTimeMin;
 
     @NotNull
     @Column("delivery_time_max")
-    private Instant delivery_time_max;
+    private Instant deliveryTimeMax;
 
     @Column("estimated_delivery")
-    private Instant estimated_delivery;
+    private Instant estimatedDelivery;
 
     @Column("distance_km")
-    private Double distance_km;
+    private Double distanceKm;
 
     @NotNull
     @Column("urgency")
     private Boolean urgency;
 
     @Column("delivery_note")
-    private String delivery_note;
+    private String deliveryNote;
 
     @NotNull
     @Column("status")
     private String status;
 
     @Column("created_at")
-    private Instant created_at;
+    private Instant createdAt;
 
     @Column("updated_at")
-    private Instant updated_at;
+    private Instant updatedAt;
 }

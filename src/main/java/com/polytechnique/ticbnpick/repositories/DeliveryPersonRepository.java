@@ -19,5 +19,5 @@ public interface DeliveryPersonRepository extends ReactiveCrudRepository<Deliver
      * @param person_id person identifier
      * @return matching courier
      */
-    Mono<DeliveryPerson> findByPersonId(UUID person_id);
+//    Mono<DeliveryPerson> findByPersonId(UUID person_id);
 }

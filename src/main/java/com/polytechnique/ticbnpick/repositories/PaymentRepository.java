@@ -19,5 +19,5 @@ public interface PaymentRepository extends ReactiveCrudRepository<Payment, UUID>
      * @param delivery_id delivery identifier
      * @return matching payment
      */
-    Mono<Payment> findByDeliveryId(UUID delivery_id);
+//    Mono<Payment> findByDeliveryId(UUID delivery_id);
 }

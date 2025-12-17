@@ -20,7 +20,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Table("packets")
 public class Packet {
 
@@ -54,4 +53,12 @@ public class Packet {
 
     @Column("description")
     private String description;
+
+    @NotNull
+    @Column("photo_packet")
+    private String photoPacket;
+
+    @NotNull
+    @Column("perishable")
+    private Boolean perishable;
 }

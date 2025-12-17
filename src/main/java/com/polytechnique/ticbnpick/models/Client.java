@@ -20,7 +20,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Table("clients")
 public class Client {
 
@@ -30,9 +29,9 @@ public class Client {
 
     @NotNull
     @Column("person_id")
-    private UUID person_id;
+    private UUID personId;
 
     @NotNull
     @Column("loyalty_status")
-    private String loyalty_status;
+    private String loyaltyStatus;
 }

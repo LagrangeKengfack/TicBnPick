@@ -19,5 +19,5 @@ public interface DeliveryRepository extends ReactiveCrudRepository<Delivery, UUI
      * @param courier_id courier identifier
      * @return list of deliveries
      */
-    Flux<Delivery> findAllByCourierId(UUID courier_id);
+//    Flux<Delivery> findAllByCourierId(UUID courier_id);
 }

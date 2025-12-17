@@ -21,7 +21,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Table("couriers")
 public class DeliveryPerson {
 
@@ -31,7 +30,7 @@ public class DeliveryPerson {
 
     @NotNull
     @Column("person_id")
-    private UUID person_id;
+    private UUID personId;
 
     @NotNull
     @Column("location")
@@ -39,11 +38,11 @@ public class DeliveryPerson {
 
     @NotNull
     @Column("commercial_register")
-    private String commercial_register;
+    private String commercialRegister;
 
     @NotNull
     @Column("commercial_name")
-    private String commercial_name;
+    private String commercialName;
 
     @NotNull
     @Column("nui")
@@ -55,16 +54,16 @@ public class DeliveryPerson {
 
     @NotNull
     @Column("is_active")
-    private Boolean is_active;
+    private Boolean isActive;
 
     @Column("created_at")
-    private Instant created_at;
+    private Instant createdAt;
 
     @Column("updated_at")
-    private Instant updated_at;
+    private Instant updatedAt;
 
     @Column("commission_rate")
-    private Double commission_rate;
+    private Double commissionRate;
 
     @Column("siret")
     private Double siret;

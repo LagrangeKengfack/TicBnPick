@@ -5,7 +5,9 @@ CREATE TABLE packets (
                          height DOUBLE PRECISION NOT NULL,
                          width DOUBLE PRECISION NOT NULL,
                          length DOUBLE PRECISION NOT NULL,
+                         photo_packet TEXT NOT NULL,
                          fragile BOOLEAN NOT NULL,
+                         perishable BOOLEAN NOT NULL,
                          description TEXT,
                          CONSTRAINT fk_packet_announcement
                              FOREIGN KEY (announcement_id)

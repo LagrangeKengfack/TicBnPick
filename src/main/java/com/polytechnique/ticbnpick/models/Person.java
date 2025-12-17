@@ -22,7 +22,6 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Table("persons")
 public class Person {
 
@@ -52,18 +51,18 @@ public class Person {
 
     @NotNull
     @Column("national_id")
-    private String national_id;
+    private String nationalId;
 
     @NotNull
     @Column("photo_card")
-    private String photo_card;
+    private String photoCard;
 
     @Column("criminal_record")
-    private String criminal_record;
+    private String criminalRecord;
 
     @Column("rating")
     private Double rating;
 
     @Column("total_deliveries")
-    private Integer total_deliveries;
+    private Integer totalDeliveries;
 }

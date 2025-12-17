@@ -21,7 +21,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Table("payments")
 public class Payment {
 
@@ -31,7 +30,7 @@ public class Payment {
 
     @NotNull
     @Column("delivery_id")
-    private UUID delivery_id;
+    private UUID deliveryId;
 
     @NotNull
     @Column("amount")
@@ -39,21 +38,21 @@ public class Payment {
 
     @NotNull
     @Column("payment_method")
-    private String payment_method;
+    private String paymentMethod;
 
     @NotNull
     @Column("status")
     private String status;
 
     @Column("transaction_reference")
-    private String transaction_reference;
+    private String transactionReference;
 
     @Column("paid_at")
-    private Instant paid_at;
+    private Instant paidAt;
 
     @Column("created_at")
-    private Instant created_at;
+    private Instant createdAt;
 
     @Column("updated_at")
-    private Instant updated_at;
+    private Instant updatedAt;
 }

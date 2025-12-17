@@ -13,7 +13,7 @@ import reactor.core.publisher.Flux;
  */
 public interface ResponseRepository extends ReactiveCrudRepository<Response, UUID> {
 
-    Flux<Response> findAllByAnnouncementId(UUID announcement_id);
-
-    Flux<Response> findAllByCourierId(UUID courier_id);
+//    Flux<Response> findAllByAnnouncementId(UUID announcement_id);
+//
+//    Flux<Response> findAllByCourierId(UUID courier_id);
 }

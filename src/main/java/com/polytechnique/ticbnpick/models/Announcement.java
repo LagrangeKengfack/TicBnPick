@@ -21,7 +21,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Table("announcements")
 public class Announcement {
 
@@ -31,15 +30,15 @@ public class Announcement {
 
     @NotNull
     @Column("client_id")
-    private UUID client_id;
+    private UUID clientId;
 
     @NotNull
     @Column("pickup_address_id")
-    private UUID pickup_address_id;
+    private UUID pickupAddressId;
 
     @NotNull
     @Column("delivery_address_id")
-    private UUID delivery_address_id;
+    private UUID deliveryAddressId;
 
     @NotNull
     @Column("title")
@@ -56,8 +55,8 @@ public class Announcement {
     private Double price;
 
     @Column("created_at")
-    private Instant created_at;
+    private Instant createdAt;
 
     @Column("updated_at")
-    private Instant updated_at;
+    private Instant updatedAt;
 }

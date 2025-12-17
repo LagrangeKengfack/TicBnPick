@@ -20,7 +20,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Table("logistics")
 public class Logistics {
 
@@ -30,39 +29,39 @@ public class Logistics {
 
     @NotNull
     @Column("courier_id")
-    private UUID courier_id;
+    private UUID courierId;
 
     @NotNull
     @Column("plate_number")
-    private String plate_number;
+    private String plateNumber;
 
     @NotNull
     @Column("logistics_photo")
-    private String logistics_photo;
+    private String logisticsPhoto;
 
     @NotNull
     @Column("logistics_type")
-    private String logistics_type;
+    private String logisticsType;
 
     @NotNull
     @Column("logistics_class")
-    private String logistics_class;
+    private String logisticsClass;
 
     @Column("rating")
     private Double rating;
 
     @Column("created_at")
-    private Instant created_at;
+    private Instant createdAt;
 
     @Column("updated_at")
-    private Instant updated_at;
+    private Instant updatedAt;
 
     @Column("tank_capacity")
-    private Double tank_capacity;
+    private Double tankCapacity;
 
     @Column("luggage_max_capacity")
-    private Double luggage_max_capacity;
+    private Double luggageMaxCapacity;
 
     @Column("total_seat_number")
-    private Integer total_seat_number;
+    private Integer totalSeatNumber;
 }

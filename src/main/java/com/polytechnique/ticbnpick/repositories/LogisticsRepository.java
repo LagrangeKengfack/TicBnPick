@@ -13,5 +13,5 @@ import reactor.core.publisher.Flux;
  */
 public interface LogisticsRepository extends ReactiveCrudRepository<Logistics, UUID> {
 
-    Flux<Logistics> findAllByCourierId(UUID courier_id);
+//    Flux<Logistics> findAllByCourierId(UUID courier_id);
 }

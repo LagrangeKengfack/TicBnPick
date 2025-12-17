@@ -20,7 +20,6 @@ import org.springframework.data.relational.core.mapping.Table;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Table("responses")
 public class Response {
 
@@ -30,24 +29,24 @@ public class Response {
 
     @NotNull
     @Column("announcement_id")
-    private UUID announcement_id;
+    private UUID announcementId;
 
     @NotNull
     @Column("courier_id")
-    private UUID courier_id;
+    private UUID courierId;
 
     @NotNull
     @Column("arrival_time")
-    private Instant arrival_time;
+    private Instant arrivalTime;
 
     @NotNull
     @Column("courier_amount")
-    private Double courier_amount;
+    private Double courierAmount;
 
     @NotNull
     @Column("status")
     private String status;
 
     @Column("created_at")
-    private Instant created_at;
+    private Instant createdAt;
 }
