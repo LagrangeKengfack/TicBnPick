@@ -2,6 +2,7 @@ package com.polytechnique.ticbnpick.services;
 
 import com.polytechnique.ticbnpick.dtos.ClientDTO;
 import com.polytechnique.ticbnpick.dtos.ClientResponseDTO;
+import com.polytechnique.ticbnpick.exceptions.ResourceNotFoundException;
 import com.polytechnique.ticbnpick.models.Client;
 import com.polytechnique.ticbnpick.models.Person;
 import com.polytechnique.ticbnpick.repositories.ClientRepository;
@@ -22,7 +23,6 @@ import java.util.UUID;
  */
 @Service
 @RequiredArgsConstructor
-
 public class ClientService {
 
     private final ClientRepository clientRepository;
@@ -33,9 +33,10 @@ public class ClientService {
      *
      * @param clientDTO client data transfer object
      * @return created client response
+     * @author Kenmeugne Michèle
+     * @date 18/12/2025
      */
     public Mono<ClientResponseDTO> createClient(ClientDTO clientDTO) {
-        // Create person first
         Person person = new Person();
         person.setLast_name(clientDTO.getLastName());
         person.setFirst_name(clientDTO.getFirstName());
@@ -50,7 +51,6 @@ public class ClientService {
 
         return personRepository.save(person)
                 .flatMap(savedPerson -> {
-                    // Create client with person_id
                     Client client = new Client();
                     client.setPersonId(savedPerson.getId());
                     client.setLoyaltyStatus(clientDTO.getLoyaltyStatus());
@@ -59,25 +59,26 @@ public class ClientService {
                             .map(savedClient -> mapToResponseDTO(savedClient, savedPerson));
                 })
                 .doOnSuccess(result -> {
-                    // Log pour debug
                     System.out.println("Client created successfully: " + result.getId());
                 })
                 .doOnError(error -> {
-                    // Log erreur
                     System.err.println("Error creating client: " + error.getMessage());
-                })
-                .cache(); // Force la completion de la transaction
+                });
     }
 
     /**
      * Retrieves a client by ID.
      *
      * @param id client identifier
-     * @return client response or empty
+     * @return client response or error
+     * @author Kenmeugne Michèle
+     * @date 18/12/2025
      */
     public Mono<ClientResponseDTO> getClientById(UUID id) {
         return clientRepository.findById(id)
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Client", "id", id)))
                 .flatMap(client -> personRepository.findById(client.getPersonId())
+                        .switchIfEmpty(Mono.error(new ResourceNotFoundException("Person", "id", client.getPersonId())))
                         .map(person -> mapToResponseDTO(client, person)));
     }
 
@@ -85,6 +86,8 @@ public class ClientService {
      * Retrieves all clients.
      *
      * @return flux of all clients
+     * @author kenmeugne Michèle
+     * @date 18/12/2025
      */
     public Flux<ClientResponseDTO> getAllClients() {
         return clientRepository.findAll()
@@ -95,15 +98,18 @@ public class ClientService {
     /**
      * Updates an existing client.
      *
-     * @param id        client identifier
+     * @param id client identifier
      * @param clientDTO updated client data
-     * @return updated client response or empty
+     * @return updated client response or error
+     * @author Kenmeugne Michèle
+     * @date 18/12/2025
      */
     public Mono<ClientResponseDTO> updateClient(UUID id, ClientDTO clientDTO) {
         return clientRepository.findById(id)
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Client", "id", id)))
                 .flatMap(existingClient -> personRepository.findById(existingClient.getPersonId())
+                        .switchIfEmpty(Mono.error(new ResourceNotFoundException("Person", "id", existingClient.getPersonId())))
                         .flatMap(existingPerson -> {
-                            // Update person fields
                             existingPerson.setLast_name(clientDTO.getLastName());
                             existingPerson.setFirst_name(clientDTO.getFirstName());
                             existingPerson.setPhone(clientDTO.getPhone());
@@ -115,7 +121,6 @@ public class ClientService {
 
                             return personRepository.save(existingPerson)
                                     .flatMap(updatedPerson -> {
-                                        // Update client fields
                                         existingClient.setLoyaltyStatus(clientDTO.getLoyaltyStatus());
 
                                         return clientRepository.save(existingClient)
@@ -128,10 +133,13 @@ public class ClientService {
      * Deletes a client by ID.
      *
      * @param id client identifier
-     * @return void mono
+     * @return void mono or error
+     * @author Kenmeugne Michele
+     * @date 18/12/2025
      */
     public Mono<Void> deleteClient(UUID id) {
         return clientRepository.findById(id)
+                .switchIfEmpty(Mono.error(new ResourceNotFoundException("Client", "id", id)))
                 .flatMap(client -> clientRepository.deleteById(id)
                         .then(personRepository.deleteById(client.getPersonId())));
     }
@@ -142,6 +150,8 @@ public class ClientService {
      * @param client client entity
      * @param person person entity
      * @return client response DTO
+     * @author Kenmeugne Michèle
+     * @date 18/12/2025
      */
     private ClientResponseDTO mapToResponseDTO(Client client, Person person) {
         ClientResponseDTO responseDTO = new ClientResponseDTO();
