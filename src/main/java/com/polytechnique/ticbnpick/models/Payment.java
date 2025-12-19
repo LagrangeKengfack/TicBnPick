@@ -1,5 +1,7 @@
 package com.polytechnique.ticbnpick.models;
 
+import com.polytechnique.ticbnpick.models.enums.payment.PaymentMethod;
+import com.polytechnique.ticbnpick.models.enums.payment.PaymentStatus;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.UUID;
@@ -38,11 +40,11 @@ public class Payment {
 
     @NotNull
     @Column("payment_method")
-    private String paymentMethod;
+    private PaymentMethod paymentMethod;
 
     @NotNull
     @Column("status")
-    private String status;
+    private PaymentStatus status;
 
     @Column("transaction_reference")
     private String transactionReference;

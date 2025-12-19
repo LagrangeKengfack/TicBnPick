@@ -26,7 +26,7 @@
 
     <changeSet id="004-create-courier" author="TicBnPickTeam">
         <sqlFile
-                path="db/changelog/create-deliveryPerson.sql"
+                path="db/changelog/create-delivery-person.sql"
                 relativeToChangelogFile="false"/>
     </changeSet>
 

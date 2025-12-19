@@ -1,7 +1,6 @@
-CREATE TABLE couriers (
+CREATE TABLE delivery_persons (
                           id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                           person_id UUID NOT NULL UNIQUE,
-                          location VARCHAR NOT NULL,
                           commercial_register VARCHAR NOT NULL,
                           commercial_name VARCHAR NOT NULL,
                           nui VARCHAR NOT NULL,

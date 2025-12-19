@@ -19,5 +19,5 @@ public interface AnnouncementRepository extends ReactiveCrudRepository<Announcem
      * @param client_id client identifier
      * @return list of announcements
      */
-//    Flux<Announcement> findAllByClientId(UUID client_id);
+    Flux<Announcement> findAllByClientId(UUID client_id);
 }

@@ -1,5 +1,7 @@
 package com.polytechnique.ticbnpick.models;
 
+import com.polytechnique.ticbnpick.models.enums.delivery.DeliveryStatus;
+import com.polytechnique.ticbnpick.models.enums.delivery.DeliveryUrgency;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.UUID;
@@ -37,8 +39,8 @@ public class Delivery {
     private UUID packetId;
 
     @NotNull
-    @Column("courier_id")
-    private UUID courierId;
+    @Column("delivery_person_id")
+    private UUID deliveryPersonId;
 
     @NotNull
     @Column("sender_phone")
@@ -72,14 +74,14 @@ public class Delivery {
 
     @NotNull
     @Column("urgency")
-    private Boolean urgency;
+    private DeliveryUrgency urgency;
 
     @Column("delivery_note")
     private String deliveryNote;
 
     @NotNull
     @Column("status")
-    private String status;
+    private DeliveryStatus status;
 
     @Column("created_at")
     private Instant createdAt;

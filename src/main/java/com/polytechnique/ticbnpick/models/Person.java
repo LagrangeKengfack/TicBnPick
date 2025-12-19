@@ -14,7 +14,7 @@ import java.util.UUID;
 /**
  * Represents a base person in the system.
  *
- * This class is the parent abstraction for client and courier.
+ * This class is the parent abstraction for client and deliveryPerson.
  *
  * @author Kengfack Lagrange
  * @date 17/12/2025

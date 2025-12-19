@@ -1,5 +1,7 @@
 package com.polytechnique.ticbnpick.models;
 
+import com.polytechnique.ticbnpick.models.enums.logistics.LogisticsClass;
+import com.polytechnique.ticbnpick.models.enums.logistics.LogisticsType;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.UUID;
@@ -12,7 +14,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Represents a logistics vehicle owned by a courier.
+ * Represents a logistics vehicle owned by a deliveryPerson.
  *
  * @author Kengfack Lagrange
  * @date 17/12/2025
@@ -28,8 +30,8 @@ public class Logistics {
     private UUID id;
 
     @NotNull
-    @Column("courier_id")
-    private UUID courierId;
+    @Column("delivery_person_id")
+    private UUID deliveryPersonId;
 
     @NotNull
     @Column("plate_number")
@@ -41,11 +43,11 @@ public class Logistics {
 
     @NotNull
     @Column("logistics_type")
-    private String logisticsType;
+    private LogisticsType logisticsType;
 
     @NotNull
     @Column("logistics_class")
-    private String logisticsClass;
+    private LogisticsClass logisticsClass;
 
     @Column("rating")
     private Double rating;

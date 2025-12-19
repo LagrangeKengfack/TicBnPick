@@ -1,5 +1,6 @@
 package com.polytechnique.ticbnpick.models;
 
+import com.polytechnique.ticbnpick.models.enums.deliveryPerson.DeliveryPersonStatus;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.UUID;
@@ -12,8 +13,8 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Represents a courier in the system.
- * A courier is a person who can perform deliveries.
+ * Represents a deliveryPerson in the system.
+ * A deliveryPerson is a person who can perform deliveries.
  *
  * @author Kengfack Lagrange
  * @date 17/12/2025
@@ -21,7 +22,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("couriers")
+@Table("delivery_persons")
 public class DeliveryPerson {
 
     @Id
@@ -31,10 +32,6 @@ public class DeliveryPerson {
     @NotNull
     @Column("person_id")
     private UUID personId;
-
-    @NotNull
-    @Column("location")
-    private String location;
 
     @NotNull
     @Column("commercial_register")
@@ -50,7 +47,7 @@ public class DeliveryPerson {
 
     @NotNull
     @Column("status")
-    private String status;
+    private DeliveryPersonStatus status;
 
     @NotNull
     @Column("is_active")

@@ -2,7 +2,7 @@ CREATE TABLE deliveries (
                             id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                             announcement_id UUID NOT NULL,
                             packet_id UUID NOT NULL,
-                            courier_id UUID NOT NULL,
+                            delivery_person_id UUID NOT NULL,
                             sender_phone VARCHAR NOT NULL,
                             receiver_phone VARCHAR NOT NULL,
                             pickup_time_min TIMESTAMP NOT NULL,
@@ -23,6 +23,6 @@ CREATE TABLE deliveries (
                                 FOREIGN KEY (packet_id)
                                     REFERENCES packets(id),
                             CONSTRAINT fk_delivery_courier
-                                FOREIGN KEY (courier_id)
-                                    REFERENCES couriers(id)
+                                FOREIGN KEY (delivery_person_id)
+                                    REFERENCES delivery_persons(id)
 );

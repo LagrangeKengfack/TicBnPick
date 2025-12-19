@@ -1,5 +1,6 @@
 package com.polytechnique.ticbnpick.models;
 
+import com.polytechnique.ticbnpick.models.enums.response.ResponseStatus;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.UUID;
@@ -12,7 +13,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Represents a courier response to an announcement.
+ * Represents a deliveryPerson response to an announcement.
  *
  * @author Kengfack Lagrange
  * @date 17/12/2025
@@ -32,20 +33,20 @@ public class Response {
     private UUID announcementId;
 
     @NotNull
-    @Column("courier_id")
-    private UUID courierId;
+    @Column("delivery_person_id")
+    private UUID deliveryPersonId;
 
     @NotNull
     @Column("arrival_time")
     private Instant arrivalTime;
 
     @NotNull
-    @Column("courier_amount")
-    private Double courierAmount;
+    @Column("delivery_person_amount")
+    private Double deliveryPersonAmount;
 
     @NotNull
     @Column("status")
-    private String status;
+    private ResponseStatus status;
 
     @Column("created_at")
     private Instant createdAt;

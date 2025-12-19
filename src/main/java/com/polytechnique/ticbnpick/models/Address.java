@@ -1,5 +1,6 @@
 package com.polytechnique.ticbnpick.models;
 
+import com.polytechnique.ticbnpick.models.enums.address.AddressType;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -12,7 +13,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * Represents a physical address in the system.
- * An address can be associated with clients, couriers or deliveries.
+ * An address can be associated with clients, deliveryPersons or deliveries.
  *
  * @author Kengfack Lagrange
  * @date 17/12/2025
@@ -38,6 +39,10 @@ public class Address {
     @NotNull
     @Column("district")
     private String district;
+
+    @NotNull
+    @Column("type")
+    private AddressType type;
 
     @NotNull
     @Column("country")

@@ -1,6 +1,6 @@
 CREATE TABLE logistics (
                            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                           courier_id UUID NOT NULL,
+                           delivery_person_id UUID NOT NULL,
                            plate_number VARCHAR NOT NULL,
                            logistics_photo TEXT NOT NULL,
                            logistics_type VARCHAR NOT NULL,
@@ -11,8 +11,8 @@ CREATE TABLE logistics (
                            tank_capacity DOUBLE PRECISION,
                            luggage_max_capacity DOUBLE PRECISION,
                            total_seat_number INTEGER,
-                           CONSTRAINT fk_logistics_courier
-                               FOREIGN KEY (courier_id)
-                                   REFERENCES couriers(id)
+                           CONSTRAINT fk_logistics_delivery_person
+                               FOREIGN KEY (delivery_person_id)
+                                   REFERENCES delivery_persons(id)
                                    ON DELETE CASCADE
 );

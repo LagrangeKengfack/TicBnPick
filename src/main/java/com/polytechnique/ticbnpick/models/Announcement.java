@@ -1,5 +1,6 @@
 package com.polytechnique.ticbnpick.models;
 
+import com.polytechnique.ticbnpick.models.enums.announcement.AnnouncementStatus;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.UUID;
@@ -49,7 +50,7 @@ public class Announcement {
 
     @NotNull
     @Column("status")
-    private String status;
+    private AnnouncementStatus status;
 
     @Column("price")
     private Double price;
