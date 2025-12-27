@@ -17,25 +17,26 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AuthenticationManager authenticationManager;
-    private final SecurityContextRepository securityContextRepository;
+        private final AuthenticationManager authenticationManager;
+        private final SecurityContextRepository securityContextRepository;
 
-    @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-        return http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authenticationManager(authenticationManager)
-                .securityContextRepository(securityContextRepository)
-                .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/api/auth/**").permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/clients").permitAll() // Allow registration
-                        .anyExchange().authenticated()
-                )
-                .build();
-    }
+        @Bean
+        public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+                return http
+                                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                                .authenticationManager(authenticationManager)
+                                .securityContextRepository(securityContextRepository)
+                                .authorizeExchange(exchanges -> exchanges
+                                                .pathMatchers("/api/delivery-persons/register").permitAll()
+                                                .pathMatchers("/api/auth/**").permitAll()
+                                                .pathMatchers(HttpMethod.POST, "/api/clients").permitAll() // Allow
+                                                                                                           // registration
+                                                .anyExchange().authenticated())
+                                .build();
+        }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 }

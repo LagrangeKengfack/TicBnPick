@@ -8,7 +8,7 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
  * Reactive repository for Address entity.
  *
  * @author Kengfack Lagrange
- * @date 17/12/2025
+ * @date 19/12/2025
  */
 public interface AddressRepository extends ReactiveCrudRepository<Address, UUID> {
 }

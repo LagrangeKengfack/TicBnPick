@@ -9,9 +9,9 @@ import reactor.core.publisher.Flux;
  * Reactive repository for Logistics entity.
  *
  * @author Kengfack Lagrange
- * @date 17/12/2025
+ * @date 19/12/2025
  */
 public interface LogisticsRepository extends ReactiveCrudRepository<Logistics, UUID> {
 
-//    Flux<Logistics> findAllByCourierId(UUID courier_id);
+    Flux<Logistics> findAllByCourierId(UUID courierId);
 }

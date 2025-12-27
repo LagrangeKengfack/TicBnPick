@@ -10,7 +10,7 @@ import java.util.UUID;
  * Reactive repository for Person entity.
  *
  * @author Kengfack Lagrange
- * @date 17/12/2025
+ * @date 19/12/2025
  */
 public interface PersonRepository extends ReactiveCrudRepository<Person, UUID> {
 
@@ -27,4 +27,12 @@ public interface PersonRepository extends ReactiveCrudRepository<Person, UUID> {
      * @return matching person
      */
     Mono<Person> findByEmail(String email);
+
+    /**
+     * Checks if a person exists by email.
+     *
+     * @param email person email
+     * @return true if exists, false otherwise
+     */
+    Mono<Boolean> existsByEmail(String email);
 }
