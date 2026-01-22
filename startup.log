@@ -1,0 +1,137 @@
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--------------------< [0;36mcom.polytechnique:TicBnPick[0;1m >---------------------[m
+[[1;34mINFO[m] [1mBuilding TicBnPick 0.0.1-SNAPSHOT[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m>>> [0;32mspring-boot-maven-plugin:4.0.0:run[m [1m(default-cli)[0;1m > [0;1mtest-compile[m @ [36mTicBnPick[0;1m >>>[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:3.3.1:resources[m [1m(default-resources)[m @ [36mTicBnPick[0;1m ---[m
+[[1;34mINFO[m] Copying 1 resource from src/main/resources to target/classes
+[[1;34mINFO[m] Copying 19 resources from src/main/resources to target/classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.14.1:compile[m [1m(default-compile)[m @ [36mTicBnPick[0;1m ---[m
+[[1;34mINFO[m] Nothing to compile - all classes are up to date.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:3.3.1:testResources[m [1m(default-testResources)[m @ [36mTicBnPick[0;1m ---[m
+[[1;34mINFO[m] skip non existing resourceDirectory /home/tchoungs/Bureau/TicBnPick/src/test/resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.14.1:testCompile[m [1m(default-testCompile)[m @ [36mTicBnPick[0;1m ---[m
+[[1;34mINFO[m] Nothing to compile - all classes are up to date.
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m<<< [0;32mspring-boot-maven-plugin:4.0.0:run[m [1m(default-cli)[0;1m < [0;1mtest-compile[m @ [36mTicBnPick[0;1m <<<[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mspring-boot-maven-plugin:4.0.0:run[m [1m(default-cli)[m @ [36mTicBnPick[0;1m ---[m
+[[1;34mINFO[m] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.0)
+
+2026-01-22T22:15:27.838+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] c.p.ticbnpick.TicBnPickApplication       : Starting TicBnPickApplication using Java 21.0.9 with PID 16790 (/home/tchoungs/Bureau/TicBnPick/target/classes started by tchoungs in /home/tchoungs/Bureau/TicBnPick)
+2026-01-22T22:15:27.851+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] c.p.ticbnpick.TicBnPickApplication       : The following 1 profile is active: "default"
+2026-01-22T22:15:27.964+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-01-22T22:15:29.500+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data R2DBC repositories in DEFAULT mode.
+2026-01-22T22:15:29.819+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 305 ms. Found 10 R2DBC repository interfaces.
+2026-01-22T22:15:32.723+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-01-22T22:15:34.564+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.database                       : Set default schema name to public
+2026-01-22T22:15:35.871+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : Reading from public.databasechangelog
+2026-01-22T22:15:36.170+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.lockservice                    : Successfully acquired change log lock
+2026-01-22T22:15:36.172+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.command                        : Using deploymentId: 9116533284
+2026-01-22T22:15:36.178+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : Reading from public.databasechangelog
+2026-01-22T22:15:36.386+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : Running Changeset: db/changelog/changelog-master.xml::001-init-extensions::TicBnpickTeam
+2026-01-22T22:15:36.455+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : extension "uuid-ossp" already exists, skipping
+2026-01-22T22:15:36.458+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : SQL in file db/changelog/init-extensions.sql executed
+2026-01-22T22:15:36.466+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : ChangeSet db/changelog/changelog-master.xml::001-init-extensions::TicBnpickTeam ran successfully in 65ms
+2026-01-22T22:15:36.516+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : Running Changeset: db/changelog/changelog-master.xml::-1-drop-all::TicBnPickTeam
+2026-01-22T22:15:36.567+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : table "payments" does not exist, skipping
+2026-01-22T22:15:36.572+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : table "responses" does not exist, skipping
+2026-01-22T22:15:36.576+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : table "deliveries" does not exist, skipping
+2026-01-22T22:15:36.580+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : table "packets" does not exist, skipping
+2026-01-22T22:15:36.587+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : table "announcements" does not exist, skipping
+2026-01-22T22:15:36.590+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : table "logistics" does not exist, skipping
+2026-01-22T22:15:36.602+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : table "couriers" does not exist, skipping
+2026-01-22T22:15:36.604+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : table "delivery_persons" does not exist, skipping
+2026-01-22T22:15:36.607+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : table "clients" does not exist, skipping
+2026-01-22T22:15:36.611+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : table "addresses" does not exist, skipping
+2026-01-22T22:15:36.615+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : table "persons" does not exist, skipping
+2026-01-22T22:15:36.619+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : table "comments" does not exist, skipping
+2026-01-22T22:15:36.621+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : table "notifications" does not exist, skipping
+2026-01-22T22:15:36.628+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : table "person_addresses" does not exist, skipping
+2026-01-22T22:15:36.630+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : SQL in file db/changelog/drop-all.sql executed
+2026-01-22T22:15:36.639+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : ChangeSet db/changelog/changelog-master.xml::-1-drop-all::TicBnPickTeam ran successfully in 122ms
+2026-01-22T22:15:36.654+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : Running Changeset: db/changelog/changelog-master.xml::002-create-person::TicBnPickTeam
+2026-01-22T22:15:36.737+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : SQL in file db/changelog/create-person.sql executed
+2026-01-22T22:15:36.742+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : ChangeSet db/changelog/changelog-master.xml::002-create-person::TicBnPickTeam ran successfully in 85ms
+2026-01-22T22:15:36.757+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : Running Changeset: db/changelog/changelog-master.xml::003-create-client::TicBnPickTeam
+2026-01-22T22:15:36.790+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : SQL in file db/changelog/create-client.sql executed
+2026-01-22T22:15:36.800+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : ChangeSet db/changelog/changelog-master.xml::003-create-client::TicBnPickTeam ran successfully in 42ms
+2026-01-22T22:15:36.816+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : Running Changeset: db/changelog/changelog-master.xml::004-create-courier::TicBnPickTeam
+2026-01-22T22:15:36.877+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : SQL in file db/changelog/create-delivery-person.sql executed
+2026-01-22T22:15:36.890+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : ChangeSet db/changelog/changelog-master.xml::004-create-courier::TicBnPickTeam ran successfully in 71ms
+2026-01-22T22:15:36.907+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : Running Changeset: db/changelog/changelog-master.xml::005-create-address::TicBnPickTeam
+2026-01-22T22:15:36.947+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : SQL in file db/changelog/create-address.sql executed
+2026-01-22T22:15:36.958+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : ChangeSet db/changelog/changelog-master.xml::005-create-address::TicBnPickTeam ran successfully in 49ms
+2026-01-22T22:15:36.974+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : Running Changeset: db/changelog/changelog-master.xml::006-create-announcement::TicBnPickTeam
+2026-01-22T22:15:37.035+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : SQL in file db/changelog/create-announcement.sql executed
+2026-01-22T22:15:37.051+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : ChangeSet db/changelog/changelog-master.xml::006-create-announcement::TicBnPickTeam ran successfully in 76ms
+2026-01-22T22:15:37.064+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : Running Changeset: db/changelog/changelog-master.xml::007-create-packet::TicBnPickTeam
+2026-01-22T22:15:37.122+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : SQL in file db/changelog/create-packet.sql executed
+2026-01-22T22:15:37.128+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : ChangeSet db/changelog/changelog-master.xml::007-create-packet::TicBnPickTeam ran successfully in 63ms
+2026-01-22T22:15:37.153+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : Running Changeset: db/changelog/changelog-master.xml::008-create-delivery::TicBnPickTeam
+2026-01-22T22:15:37.216+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : SQL in file db/changelog/create-delivery.sql executed
+2026-01-22T22:15:37.223+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : ChangeSet db/changelog/changelog-master.xml::008-create-delivery::TicBnPickTeam ran successfully in 69ms
+2026-01-22T22:15:37.247+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : Running Changeset: db/changelog/changelog-master.xml::009-create-payment::TicBnPickTeam
+2026-01-22T22:15:37.294+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : SQL in file db/changelog/create-payment.sql executed
+2026-01-22T22:15:37.318+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : ChangeSet db/changelog/changelog-master.xml::009-create-payment::TicBnPickTeam ran successfully in 71ms
+2026-01-22T22:15:37.333+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : Running Changeset: db/changelog/changelog-master.xml::010-create-logistics::TicBnPickTeam
+2026-01-22T22:15:37.364+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : SQL in file db/changelog/create-logistics.sql executed
+2026-01-22T22:15:37.373+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : ChangeSet db/changelog/changelog-master.xml::010-create-logistics::TicBnPickTeam ran successfully in 38ms
+2026-01-22T22:15:37.386+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : Running Changeset: db/changelog/changelog-master.xml::011-create-response::TicBnPickTeam
+2026-01-22T22:15:37.420+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : SQL in file db/changelog/create-response.sql executed
+2026-01-22T22:15:37.438+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : ChangeSet db/changelog/changelog-master.xml::011-create-response::TicBnPickTeam ran successfully in 52ms
+2026-01-22T22:15:37.448+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : Running Changeset: db/changelog/changelog-master.xml::013-create-notification::TicBnPickTeam
+2026-01-22T22:15:37.481+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : SQL in file db/changelog/create-notification.sql executed
+2026-01-22T22:15:37.491+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : ChangeSet db/changelog/changelog-master.xml::013-create-notification::TicBnPickTeam ran successfully in 39ms
+2026-01-22T22:15:37.506+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : Running Changeset: db/changelog/changelog-master.xml::014-create-comment::TicBnPickTeam
+2026-01-22T22:15:37.543+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : SQL in file db/changelog/create-comment.sql executed
+2026-01-22T22:15:37.558+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : ChangeSet db/changelog/changelog-master.xml::014-create-comment::TicBnPickTeam ran successfully in 52ms
+2026-01-22T22:15:37.568+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : Running Changeset: db/changelog/changelog-master.xml::015-create-person-address::TicBnPickTeam
+2026-01-22T22:15:37.589+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : SQL in file db/changelog/create-person-address.sql executed
+2026-01-22T22:15:37.597+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : ChangeSet db/changelog/changelog-master.xml::015-create-person-address::TicBnPickTeam ran successfully in 28ms
+2026-01-22T22:15:37.625+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.util                           : UPDATE SUMMARY
+2026-01-22T22:15:37.625+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.util                           : Run:                         15
+2026-01-22T22:15:37.625+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.util                           : Previously run:               1
+2026-01-22T22:15:37.625+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.util                           : Filtered out:                 0
+2026-01-22T22:15:37.625+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.util                           : -------------------------------
+2026-01-22T22:15:37.626+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.util                           : Total change sets:           16
+2026-01-22T22:15:37.627+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.util                           : Update summary generated
+2026-01-22T22:15:37.631+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.command                        : Update command completed successfully.
+2026-01-22T22:15:37.631+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.ui                             : Liquibase: Update has been successful. Rows affected: 3
+2026-01-22T22:15:37.642+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.lockservice                    : Successfully released change log lock
+2026-01-22T22:15:37.645+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] liquibase.command                        : Command execution complete
+2026-01-22T22:15:40.969+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] o.s.boot.reactor.netty.NettyWebServer    : Netty started on port 8080 (http)
+2026-01-22T22:15:40.982+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] c.p.ticbnpick.TicBnPickApplication       : Started TicBnPickApplication in 14.276 seconds (process running for 15.453)
+2026-01-22T22:15:40.990+01:00  INFO 16790 --- [TicBnPick] [  restartedMain] c.p.ticbnpick.config.DataSeeder          : Checking for existing clients...
+2026-01-22T22:15:41.720+01:00  INFO 16790 --- [TicBnPick] [tor-tcp-epoll-1] c.p.ticbnpick.config.DataSeeder          : No clients found. Seeding test client...
+2026-01-22T22:15:41.988+01:00  INFO 16790 --- [TicBnPick] [tor-tcp-epoll-3] c.p.ticbnpick.config.DataSeeder          :  Test Client Created with ID: a45d7574-90ff-4fac-9478-c8b62cfcfb6c
+2026-01-22T22:15:41.988+01:00  INFO 16790 --- [TicBnPick] [tor-tcp-epoll-3] c.p.ticbnpick.config.DataSeeder          : Data seeding check completed.
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1;31mBUILD FAILURE[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Total time:  04:53 min
+[[1;34mINFO[m] Finished at: 2026-01-22T22:20:10+01:00
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;31mERROR[m] Failed to execute goal [32morg.springframework.boot:spring-boot-maven-plugin:4.0.0:run[m [1m(default-cli)[m on project [36mTicBnPick[m: [1;31mProcess terminated with exit code: 137[m -> [1m[Help 1][m
+[[1;31mERROR[m] 
+[[1;31mERROR[m] To see the full stack trace of the errors, re-run Maven with the [1m-e[m switch.
+[[1;31mERROR[m] Re-run Maven using the [1m-X[m switch to enable full debug logging.
+[[1;31mERROR[m] 
+[[1;31mERROR[m] For more information about the errors and possible solutions, please read the following articles:
+[[1;31mERROR[m] [1m[Help 1][m http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException

@@ -1,0 +1,203 @@
+[[1;34mINFO[m] Scanning for projects...
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--------------------< [0;36mcom.polytechnique:TicBnPick[0;1m >---------------------[m
+[[1;34mINFO[m] [1mBuilding TicBnPick 0.0.1-SNAPSHOT[m
+[[1;34mINFO[m] [1m--------------------------------[ jar ]---------------------------------[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m>>> [0;32mspring-boot-maven-plugin:4.0.0:run[m [1m(default-cli)[0;1m > [0;1mtest-compile[m @ [36mTicBnPick[0;1m >>>[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:3.3.1:resources[m [1m(default-resources)[m @ [36mTicBnPick[0;1m ---[m
+[[1;34mINFO[m] Copying 1 resource from src/main/resources to target/classes
+[[1;34mINFO[m] Copying 19 resources from src/main/resources to target/classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.14.1:compile[m [1m(default-compile)[m @ [36mTicBnPick[0;1m ---[m
+[[1;34mINFO[m] Recompiling the module because of [1mchanged source code[m.
+[[1;34mINFO[m] Compiling 66 source files with javac [debug parameters release 21] to target/classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-resources-plugin:3.3.1:testResources[m [1m(default-testResources)[m @ [36mTicBnPick[0;1m ---[m
+[[1;34mINFO[m] skip non existing resourceDirectory /home/tchoungs/Bureau/TicBnPick/src/test/resources
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mmaven-compiler-plugin:3.14.1:testCompile[m [1m(default-testCompile)[m @ [36mTicBnPick[0;1m ---[m
+[[1;34mINFO[m] Recompiling the module because of [1mchanged dependency[m.
+[[1;34mINFO[m] Compiling 1 source file with javac [debug parameters release 21] to target/test-classes
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m<<< [0;32mspring-boot-maven-plugin:4.0.0:run[m [1m(default-cli)[0;1m < [0;1mtest-compile[m @ [36mTicBnPick[0;1m <<<[m
+[[1;34mINFO[m] 
+[[1;34mINFO[m] 
+[[1;34mINFO[m] [1m--- [0;32mspring-boot-maven-plugin:4.0.0:run[m [1m(default-cli)[m @ [36mTicBnPick[0;1m ---[m
+[[1;34mINFO[m] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.0)
+
+2026-01-22T22:21:08.533+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] c.p.ticbnpick.TicBnPickApplication       : Starting TicBnPickApplication using Java 21.0.9 with PID 17129 (/home/tchoungs/Bureau/TicBnPick/target/classes started by tchoungs in /home/tchoungs/Bureau/TicBnPick)
+2026-01-22T22:21:08.538+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] c.p.ticbnpick.TicBnPickApplication       : The following 1 profile is active: "default"
+2026-01-22T22:21:08.625+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-01-22T22:21:10.023+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data R2DBC repositories in DEFAULT mode.
+2026-01-22T22:21:10.234+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 201 ms. Found 10 R2DBC repository interfaces.
+2026-01-22T22:21:12.711+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 1 endpoint beneath base path '/actuator'
+2026-01-22T22:21:13.878+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.database                       : Set default schema name to public
+2026-01-22T22:21:15.239+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : Reading from public.databasechangelog
+2026-01-22T22:21:15.556+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.lockservice                    : Successfully acquired change log lock
+2026-01-22T22:21:15.560+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.command                        : Using deploymentId: 9116873020
+2026-01-22T22:21:15.563+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : Reading from public.databasechangelog
+2026-01-22T22:21:15.609+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.ui                             : Running Changeset: db/changelog/changelog-master.xml::001-init-extensions::TicBnpickTeam
+2026-01-22T22:21:15.659+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.ui                             : extension "uuid-ossp" already exists, skipping
+2026-01-22T22:21:15.660+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : SQL in file db/changelog/init-extensions.sql executed
+2026-01-22T22:21:15.669+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : ChangeSet db/changelog/changelog-master.xml::001-init-extensions::TicBnpickTeam ran successfully in 51ms
+2026-01-22T22:21:15.712+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.ui                             : Running Changeset: db/changelog/changelog-master.xml::-1-drop-all::TicBnPickTeam
+2026-01-22T22:21:15.778+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.ui                             : table "couriers" does not exist, skipping
+2026-01-22T22:21:15.789+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.ui                             : drop cascades to constraint fk_pa_address on table person_addresses
+2026-01-22T22:21:15.798+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.ui                             : drop cascades to 4 other objects
+2026-01-22T22:21:15.805+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.ui                             : table "subscriptions" does not exist, skipping
+2026-01-22T22:21:15.810+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : SQL in file db/changelog/drop-all.sql executed
+2026-01-22T22:21:15.824+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : ChangeSet db/changelog/changelog-master.xml::-1-drop-all::TicBnPickTeam ran successfully in 112ms
+2026-01-22T22:21:15.843+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.ui                             : Running Changeset: db/changelog/changelog-master.xml::012-create-subscription::TicBnPickTeam
+2026-01-22T22:21:15.879+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : SQL in file db/changelog/create-subscription.sql executed
+2026-01-22T22:21:15.885+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.changelog                      : ChangeSet db/changelog/changelog-master.xml::012-create-subscription::TicBnPickTeam ran successfully in 41ms
+2026-01-22T22:21:15.914+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.util                           : UPDATE SUMMARY
+2026-01-22T22:21:15.914+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.util                           : Run:                          3
+2026-01-22T22:21:15.914+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.util                           : Previously run:              13
+2026-01-22T22:21:15.915+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.util                           : Filtered out:                 0
+2026-01-22T22:21:15.915+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.util                           : -------------------------------
+2026-01-22T22:21:15.915+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.util                           : Total change sets:           16
+2026-01-22T22:21:15.916+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.util                           : Update summary generated
+2026-01-22T22:21:15.924+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.command                        : Update command completed successfully.
+2026-01-22T22:21:15.925+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.ui                             : Liquibase: Update has been successful. Rows affected: 14
+2026-01-22T22:21:15.933+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.lockservice                    : Successfully released change log lock
+2026-01-22T22:21:15.937+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] liquibase.command                        : Command execution complete
+2026-01-22T22:21:19.209+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] o.s.boot.reactor.netty.NettyWebServer    : Netty started on port 8080 (http)
+2026-01-22T22:21:19.230+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] c.p.ticbnpick.TicBnPickApplication       : Started TicBnPickApplication in 11.328 seconds (process running for 12.531)
+2026-01-22T22:21:19.237+01:00  INFO 17129 --- [TicBnPick] [  restartedMain] c.p.ticbnpick.config.DataSeeder          : Checking for existing clients...
+2026-01-22T22:21:20.025+01:00 ERROR 17129 --- [TicBnPick] [tor-tcp-epoll-1] c.p.ticbnpick.config.DataSeeder          : Error seeding data:
+
+org.springframework.r2dbc.BadSqlGrammarException: executeMany; bad SQL grammar [SELECT COUNT(*) FROM "clients"]
+	at org.springframework.r2dbc.connection.ConnectionFactoryUtils.convertR2dbcException(ConnectionFactoryUtils.java:255) ~[spring-r2dbc-7.0.1.jar:7.0.1]
+	at org.springframework.r2dbc.core.DefaultDatabaseClient.lambda$inConnectionMany$3(DefaultDatabaseClient.java:156) ~[spring-r2dbc-7.0.1.jar:7.0.1]
+	at reactor.core.publisher.Flux.lambda$onErrorMap$1(Flux.java:7350) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.Flux.lambda$onErrorResume$0(Flux.java:7403) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:95) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxUsingWhen$UsingWhenSubscriber.deferredError(FluxUsingWhen.java:406) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxUsingWhen$RollbackInner.onComplete(FluxUsingWhen.java:483) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.onComplete(Operators.java:2225) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onComplete(FluxPeek.java:263) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.onComplete(Operators.java:2225) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.onComplete(MonoIgnoreThen.java:213) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.onComplete(MonoIgnoreThen.java:213) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.pool.SimpleDequePool.maybeRecycleAndDrain(SimpleDequePool.java:548) ~[reactor-pool-1.2.0.jar:1.2.0]
+	at reactor.pool.SimpleDequePool$QueuePoolRecyclerInner.onComplete(SimpleDequePool.java:790) ~[reactor-pool-1.2.0.jar:1.2.0]
+	at reactor.core.publisher.Operators.complete(Operators.java:137) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoEmpty.subscribe(MonoEmpty.java:46) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4569) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.pool.SimpleDequePool$QueuePoolRecyclerMono.subscribe(SimpleDequePool.java:903) ~[reactor-pool-1.2.0.jar:1.2.0]
+	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:54) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.subscribeNext(MonoIgnoreThen.java:244) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.onComplete(MonoIgnoreThen.java:207) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onComplete(FluxPeek.java:263) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.Operators.complete(Operators.java:137) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoEmpty.subscribe(MonoEmpty.java:46) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4569) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.subscribeNext(MonoIgnoreThen.java:268) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoIgnoreThen.subscribe(MonoIgnoreThen.java:51) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:54) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.subscribeNext(MonoIgnoreThen.java:244) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.onComplete(MonoIgnoreThen.java:207) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoIgnoreElements$IgnoreElementsSubscriber.onComplete(MonoIgnoreElements.java:89) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxHandleFuseable$HandleFuseableSubscriber.onComplete(FluxHandleFuseable.java:242) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoSupplier$MonoSupplierSubscription.request(MonoSupplier.java:145) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxHandleFuseable$HandleFuseableSubscriber.request(FluxHandleFuseable.java:262) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoIgnoreElements$IgnoreElementsSubscriber.onSubscribe(MonoIgnoreElements.java:72) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxHandleFuseable$HandleFuseableSubscriber.onSubscribe(FluxHandleFuseable.java:166) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoSupplier.subscribe(MonoSupplier.java:47) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4569) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoIgnoreThen$ThenIgnoreMain.subscribeNext(MonoIgnoreThen.java:268) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoIgnoreThen.subscribe(MonoIgnoreThen.java:51) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:75) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:54) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4569) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:104) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoIgnoreElements$IgnoreElementsSubscriber.onError(MonoIgnoreElements.java:84) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxMap$MapSubscriber.onError(FluxMap.java:134) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxFilter$FilterSubscriber.onError(FluxFilter.java:158) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxFilter$FilterConditionalSubscriber.onError(FluxFilter.java:292) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxMap$MapConditionalSubscriber.onError(FluxMap.java:265) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.Operators.error(Operators.java:198) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoError.subscribe(MonoError.java:54) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoDeferContextual.subscribe(MonoDeferContextual.java:56) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.InternalMonoOperator.subscribe(InternalMonoOperator.java:75) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.MonoDefer.subscribe(MonoDefer.java:54) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4569) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxUsingWhen$UsingWhenSubscriber.onError(FluxUsingWhen.java:371) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxFlatMap$FlatMapMain.checkTerminated(FluxFlatMap.java:848) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxFlatMap$FlatMapMain.drainLoop(FluxFlatMap.java:614) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxFlatMap$FlatMapMain.drain(FluxFlatMap.java:594) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxFlatMap$FlatMapMain.innerError(FluxFlatMap.java:869) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxFlatMap$FlatMapInner.onError(FluxFlatMap.java:999) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxHandleFuseable$HandleFuseableSubscriber.onNext(FluxHandleFuseable.java:204) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxWindowPredicate$WindowFlux.drainRegular(FluxWindowPredicate.java:681) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxWindowPredicate$WindowFlux.drain(FluxWindowPredicate.java:759) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxWindowPredicate$WindowFlux.onNext(FluxWindowPredicate.java:801) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxWindowPredicate$WindowPredicateMain.onNext(FluxWindowPredicate.java:247) ~[reactor-core-3.8.0.jar:3.8.0]
+	at io.r2dbc.postgresql.util.FluxDiscardOnCancel$FluxDiscardOnCancelSubscriber.onNext(FluxDiscardOnCancel.java:91) ~[r2dbc-postgresql-1.1.1.RELEASE.jar:1.1.1.RELEASE]
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onNext(FluxContextWrite.java:109) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxCreate$BufferAsyncSink.drain(FluxCreate.java:890) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxCreate$BufferAsyncSink.next(FluxCreate.java:815) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxCreate$SerializedFluxSink.next(FluxCreate.java:165) ~[reactor-core-3.8.0.jar:3.8.0]
+	at io.r2dbc.postgresql.client.ReactorNettyClient$Conversation.emit(ReactorNettyClient.java:717) ~[r2dbc-postgresql-1.1.1.RELEASE.jar:1.1.1.RELEASE]
+	at io.r2dbc.postgresql.client.ReactorNettyClient$BackendMessageSubscriber.emit(ReactorNettyClient.java:969) ~[r2dbc-postgresql-1.1.1.RELEASE.jar:1.1.1.RELEASE]
+	at io.r2dbc.postgresql.client.ReactorNettyClient$BackendMessageSubscriber.onNext(ReactorNettyClient.java:843) ~[r2dbc-postgresql-1.1.1.RELEASE.jar:1.1.1.RELEASE]
+	at io.r2dbc.postgresql.client.ReactorNettyClient$BackendMessageSubscriber.onNext(ReactorNettyClient.java:749) ~[r2dbc-postgresql-1.1.1.RELEASE.jar:1.1.1.RELEASE]
+	at reactor.core.publisher.FluxHandle$HandleSubscriber.onNext(FluxHandle.java:132) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxPeekFuseable$PeekConditionalSubscriber.onNext(FluxPeekFuseable.java:850) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxMap$MapConditionalSubscriber.onNext(FluxMap.java:224) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.core.publisher.FluxMap$MapConditionalSubscriber.onNext(FluxMap.java:224) ~[reactor-core-3.8.0.jar:3.8.0]
+	at reactor.netty.channel.FluxReceive.drainReceiver(FluxReceive.java:296) ~[reactor-netty-core-1.3.0.jar:1.3.0]
+	at reactor.netty.channel.FluxReceive.onInboundNext(FluxReceive.java:407) ~[reactor-netty-core-1.3.0.jar:1.3.0]
+	at reactor.netty.channel.ChannelOperations.onInboundNext(ChannelOperations.java:445) ~[reactor-netty-core-1.3.0.jar:1.3.0]
+	at reactor.netty.channel.ChannelOperationsHandler.channelRead(ChannelOperationsHandler.java:115) ~[reactor-netty-core-1.3.0.jar:1.3.0]
+	at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:356) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.handler.codec.ByteToMessageDecoder.fireChannelRead(ByteToMessageDecoder.java:346) ~[netty-codec-base-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.handler.codec.ByteToMessageDecoder.fireChannelRead(ByteToMessageDecoder.java:333) ~[netty-codec-base-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.handler.codec.ByteToMessageDecoder.callDecode(ByteToMessageDecoder.java:455) ~[netty-codec-base-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.handler.codec.ByteToMessageDecoder.channelRead(ByteToMessageDecoder.java:290) ~[netty-codec-base-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.AbstractChannelHandlerContext.fireChannelRead(AbstractChannelHandlerContext.java:356) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.DefaultChannelPipeline$HeadContext.channelRead(DefaultChannelPipeline.java:1429) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.DefaultChannelPipeline.fireChannelRead(DefaultChannelPipeline.java:918) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.epoll.AbstractEpollStreamChannel$EpollStreamUnsafe.epollInReady(AbstractEpollStreamChannel.java:794) ~[netty-transport-classes-epoll-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.epoll.AbstractEpollChannel$AbstractEpollUnsafe.handle(AbstractEpollChannel.java:482) ~[netty-transport-classes-epoll-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.epoll.EpollIoHandler$DefaultEpollIoRegistration.handle(EpollIoHandler.java:317) ~[netty-transport-classes-epoll-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.epoll.EpollIoHandler.processReady(EpollIoHandler.java:515) ~[netty-transport-classes-epoll-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.epoll.EpollIoHandler.run(EpollIoHandler.java:460) ~[netty-transport-classes-epoll-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.SingleThreadIoEventLoop.runIo(SingleThreadIoEventLoop.java:225) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.channel.SingleThreadIoEventLoop.run(SingleThreadIoEventLoop.java:196) ~[netty-transport-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.util.concurrent.SingleThreadEventExecutor$5.run(SingleThreadEventExecutor.java:1193) ~[netty-common-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74) ~[netty-common-4.2.7.Final.jar:4.2.7.Final]
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30) ~[netty-common-4.2.7.Final.jar:4.2.7.Final]
+	at java.base/java.lang.Thread.run(Thread.java:1583) ~[na:na]
+Caused by: io.r2dbc.postgresql.ExceptionFactory$PostgresqlBadGrammarException: relation "clients" does not exist
+	at io.r2dbc.postgresql.ExceptionFactory.createException(ExceptionFactory.java:96) ~[r2dbc-postgresql-1.1.1.RELEASE.jar:1.1.1.RELEASE]
+	at io.r2dbc.postgresql.ExceptionFactory.createException(ExceptionFactory.java:65) ~[r2dbc-postgresql-1.1.1.RELEASE.jar:1.1.1.RELEASE]
+	at io.r2dbc.postgresql.ExceptionFactory.handleErrorResponse(ExceptionFactory.java:132) ~[r2dbc-postgresql-1.1.1.RELEASE.jar:1.1.1.RELEASE]
+	at io.r2dbc.postgresql.PostgresqlResult.lambda$map$0(PostgresqlResult.java:117) ~[r2dbc-postgresql-1.1.1.RELEASE.jar:1.1.1.RELEASE]
+	at reactor.core.publisher.FluxHandleFuseable$HandleFuseableSubscriber.onNext(FluxHandleFuseable.java:182) ~[reactor-core-3.8.0.jar:3.8.0]
+	... 40 common frames omitted
+
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] [1;31mBUILD FAILURE[m
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;34mINFO[m] Total time:  02:56 min
+[[1;34mINFO[m] Finished at: 2026-01-22T22:23:42+01:00
+[[1;34mINFO[m] [1m------------------------------------------------------------------------[m
+[[1;31mERROR[m] Failed to execute goal [32morg.springframework.boot:spring-boot-maven-plugin:4.0.0:run[m [1m(default-cli)[m on project [36mTicBnPick[m: [1;31mProcess terminated with exit code: 137[m -> [1m[Help 1][m
+[[1;31mERROR[m] 
+[[1;31mERROR[m] To see the full stack trace of the errors, re-run Maven with the [1m-e[m switch.
+[[1;31mERROR[m] Re-run Maven using the [1m-X[m switch to enable full debug logging.
+[[1;31mERROR[m] 
+[[1;31mERROR[m] For more information about the errors and possible solutions, please read the following articles:
+[[1;31mERROR[m] [1m[Help 1][m http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException
