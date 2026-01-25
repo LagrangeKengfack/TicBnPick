@@ -6,77 +6,77 @@
            http://www.liquibase.org/xml/ns/dbchangelog
            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.23.xsd">
 
-    <changeSet id="001-init-extensions" author="TicBnpickTeam">
+    <changeSet id="001-init-extensions" author="TiiBnPickTeam">
         <validCheckSum>ANY</validCheckSum>
         <sqlFile
                 path="db/changelog/init-extensions.sql"
                 relativeToChangelogFile="false"/>
     </changeSet>
 
-    <changeSet id="002-create-person" author="TicBnPickTeam">
+    <changeSet id="002-create-person" author="TiiBnPickTeam">
         <validCheckSum>ANY</validCheckSum>
         <sqlFile
                 path="db/changelog/create-person.sql"
                 relativeToChangelogFile="false"/>
     </changeSet>
 
-    <changeSet id="003-create-client" author="TicBnPickTeam">
+    <changeSet id="003-create-client" author="TiiBnPickTeam">
         <validCheckSum>ANY</validCheckSum>
         <sqlFile
                 path="db/changelog/create-client.sql"
                 relativeToChangelogFile="false"/>
     </changeSet>
 
-    <changeSet id="004-create-courier" author="TicBnPickTeam">
+    <changeSet id="004-create-deliveryPerson" author="TiiBnPickTeam">
         <validCheckSum>ANY</validCheckSum>
         <sqlFile
-                path="db/changelog/create-delivery-person.sql"
+                path="db/changelog/create-deliveryPerson.sql"
                 relativeToChangelogFile="false"/>
     </changeSet>
 
-    <changeSet id="005-create-address" author="TicBnPickTeam">
+    <changeSet id="005-create-address" author="TiiBnPickTeam">
         <validCheckSum>ANY</validCheckSum>
         <sqlFile
                 path="db/changelog/create-address.sql"
                 relativeToChangelogFile="false"/>
     </changeSet>
 
-    <changeSet id="006-create-announcement" author="TicBnPickTeam">
+    <changeSet id="006-create-announcement" author="TiiBnPickTeam">
         <validCheckSum>ANY</validCheckSum>
         <sqlFile
                 path="db/changelog/create-announcement.sql"
                 relativeToChangelogFile="false"/>
     </changeSet>
 
-    <changeSet id="007-create-packet" author="TicBnPickTeam">
+    <changeSet id="007-create-packet" author="TiiBnPickTeam">
         <validCheckSum>ANY</validCheckSum>
         <sqlFile
                 path="db/changelog/create-packet.sql"
                 relativeToChangelogFile="false"/>
     </changeSet>
 
-    <changeSet id="008-create-delivery" author="TicBnPickTeam">
+    <changeSet id="008-create-delivery" author="TiiBnPickTeam">
         <validCheckSum>ANY</validCheckSum>
         <sqlFile
                 path="db/changelog/create-delivery.sql"
                 relativeToChangelogFile="false"/>
     </changeSet>
 
-    <changeSet id="009-create-payment" author="TicBnPickTeam">
+    <changeSet id="009-create-payment" author="TiiBnPickTeam">
         <validCheckSum>ANY</validCheckSum>
         <sqlFile
                 path="db/changelog/create-payment.sql"
                 relativeToChangelogFile="false"/>
     </changeSet>
 
-    <changeSet id="010-create-logistics" author="TicBnPickTeam">
+    <changeSet id="010-create-logistics" author="TiiBnPickTeam">
         <validCheckSum>ANY</validCheckSum>
         <sqlFile
                 path="db/changelog/create-logistics.sql"
                 relativeToChangelogFile="false"/>
     </changeSet>
 
-    <changeSet id="011-create-response" author="TicBnPickTeam">
+    <changeSet id="011-create-response" author="TiiBnPickTeam">
         <validCheckSum>ANY</validCheckSum>
         <sqlFile
                 path="db/changelog/create-response.sql"
@@ -85,28 +85,28 @@
 
 
 
-    <changeSet id="012-create-subscription" author="TicBnPickTeam">
+    <changeSet id="012-create-subscription" author="TiiBnPickTeam">
         <validCheckSum>ANY</validCheckSum>
         <sqlFile
                 path="db/changelog/create-subscription.sql"
                 relativeToChangelogFile="false"/>
     </changeSet>
 
-    <changeSet id="013-create-notification" author="TicBnPickTeam">
+    <changeSet id="013-create-notification" author="TiiBnPickTeam">
         <validCheckSum>ANY</validCheckSum>
         <sqlFile
                 path="db/changelog/create-notification.sql"
                 relativeToChangelogFile="false"/>
     </changeSet>
 
-    <changeSet id="014-create-comment" author="TicBnPickTeam">
+    <changeSet id="014-create-comment" author="TiiBnPickTeam">
         <validCheckSum>ANY</validCheckSum>
         <sqlFile
                 path="db/changelog/create-comment.sql"
                 relativeToChangelogFile="false"/>
     </changeSet>
 
-    <changeSet id="015-create-person-address" author="TicBnPickTeam">
+    <changeSet id="015-create-person-address" author="TiiBnPickTeam">
         <validCheckSum>ANY</validCheckSum>
         <sqlFile
                 path="db/changelog/create-person-address.sql"

@@ -3,7 +3,7 @@ CREATE TABLE addresses (
     street VARCHAR NOT NULL,
     city VARCHAR NOT NULL,
     district VARCHAR NOT NULL,
-    type VARCHAR NOT NULL,
+    type VARCHAR NOT NULL DEFAULT 'PRIMARY',
     country VARCHAR NOT NULL,
     description VARCHAR
 );
