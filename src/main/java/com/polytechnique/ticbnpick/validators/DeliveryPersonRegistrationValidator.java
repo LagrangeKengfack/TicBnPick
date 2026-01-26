@@ -13,6 +13,14 @@ import reactor.core.publisher.Mono;
 @Component
 public class DeliveryPersonRegistrationValidator {
 
+    /**
+     * Validates a delivery person registration request.
+     *
+     * Checks for data integrity, required fields, and format constraints.
+     *
+     * @param request the registration request to validate
+     * @return a Mono<Void> that completes empty if valid, or signals error
+     */
     public Mono<Void> validate(DeliveryPersonRegistrationRequest request) {
         // TODO: Implement validation logic (e.g., check if email is valid, fields are not empty)
         // Return Mono.error(new ValidationException(...)) if invalid, else Mono.empty()

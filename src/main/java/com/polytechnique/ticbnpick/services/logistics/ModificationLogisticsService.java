@@ -18,6 +18,15 @@ public class ModificationLogisticsService {
 
     private final LogisticsRepository logisticsRepository;
 
+    /**
+     * Updates an existing Logistics entity in the database.
+     *
+     * Saves the provided Logistics object, updating the existing record based on ID.
+     *
+     * @param logistics the Logistics object with updated fields
+     * @return a Mono containing the updated Logistics entity
+     * @throws org.springframework.dao.OptimisticLockingFailureException if version mismatch occurs
+     */
     public Mono<Logistics> updateLogistics(Logistics logistics) {
         // TODO:
         // Purpose: Update Logistics entry

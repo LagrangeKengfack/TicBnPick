@@ -18,6 +18,15 @@ public class ModificationPersonService {
 
     private final PersonRepository personRepository;
 
+    /**
+     * Updates an existing Person entity in the database.
+     *
+     * Saves the provided Person object, updating the existing record based on ID.
+     *
+     * @param person the Person object with updated fields
+     * @return a Mono containing the updated Person entity
+     * @throws org.springframework.dao.OptimisticLockingFailureException if version mismatch occurs
+     */
     public Mono<Person> updatePerson(Person person) {
         // TODO:
         // Purpose: Update an existing Person entity

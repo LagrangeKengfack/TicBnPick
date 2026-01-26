@@ -13,6 +13,14 @@ import reactor.core.publisher.Mono;
 @Component
 public class DeliveryPersonUpdateValidator {
 
+    /**
+     * Validates a delivery person update request.
+     *
+     * Ensures that the requested updates comply with business rules.
+     *
+     * @param request the update request to validate
+     * @return a Mono<Void> that completes empty if valid, or signals error
+     */
     public Mono<Void> validate(DeliveryPersonUpdateRequest request) {
         // TODO: Implement validation logic
         return Mono.empty();

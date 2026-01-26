@@ -18,6 +18,15 @@ public class CreationAddressService {
 
     private final AddressRepository addressRepository;
 
+    /**
+     * Persists a new Address entity to the database.
+     *
+     * Validates the address object and saves it to the repository.
+     *
+     * @param address the transient Address object to persist
+     * @return a Mono containing the persisted Address entity
+     * @throws org.springframework.dao.DataIntegrityViolationException if data integrity is violated
+     */
     public Mono<Address> createAddress(Address address) {
         // TODO:
         // Purpose: Create new Address

@@ -20,6 +20,14 @@ public class LectureDeliveryPersonService {
 
     private final DeliveryPersonRepository deliveryPersonRepository;
 
+    /**
+     * Retrieves a DeliveryPerson by their unique identifier.
+     *
+     * Queries the repository for a DeliveryPerson with the specified ID.
+     *
+     * @param id the UUID of the delivery person to retrieve
+     * @return a Mono containing the DeliveryPerson if found, or empty if not
+     */
     public Mono<DeliveryPerson> findById(UUID id) {
         // TODO:
         // Purpose: Retrieve DeliveryPerson by ID
@@ -35,6 +43,14 @@ public class LectureDeliveryPersonService {
         return deliveryPersonRepository.findById(id);
     }
 
+    /**
+     * Retrieves a DeliveryPerson by their associated Person ID.
+     *
+     * Queries the repository for a DeliveryPerson linked to the specified Person ID.
+     *
+     * @param personId the UUID of the associated Person
+     * @return a Mono containing the DeliveryPerson if found, or empty if not
+     */
     public Mono<DeliveryPerson> findByPersonId(UUID personId) {
         // TODO:
         // Purpose: Retrieve DeliveryPerson by Person ID

@@ -19,6 +19,14 @@ public class SuppressionDeliveryPersonService {
 
     private final DeliveryPersonRepository deliveryPersonRepository;
 
+    /**
+     * Deletes a DeliveryPerson by their unique identifier.
+     *
+     * Removes the DeliveryPerson record from the repository.
+     *
+     * @param id the UUID of the delivery person to delete
+     * @return a Mono<Void> signaling completion
+     */
     public Mono<Void> deleteById(UUID id) {
         // TODO:
         // Purpose: Delete DeliveryPerson by ID

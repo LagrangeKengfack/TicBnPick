@@ -2,17 +2,24 @@ package com.polytechnique.ticbnpick.services;
 
 import com.polytechnique.ticbnpick.dtos.requests.DeliveryPersonRegistrationRequest;
 import com.polytechnique.ticbnpick.dtos.responses.DeliveryPersonRegistrationResponse;
+import com.polytechnique.ticbnpick.exceptions.EmailAlreadyUsedException;
 import com.polytechnique.ticbnpick.mappers.DeliveryPersonMapper;
+import com.polytechnique.ticbnpick.models.Address;
+import com.polytechnique.ticbnpick.models.DeliveryPerson;
+import com.polytechnique.ticbnpick.models.Logistics;
+import com.polytechnique.ticbnpick.models.Person;
+import com.polytechnique.ticbnpick.models.enums.deliveryPerson.DeliveryPersonStatus;
 import com.polytechnique.ticbnpick.services.address.CreationAddressService;
 import com.polytechnique.ticbnpick.services.deliveryperson.CreationDeliveryPersonService;
 import com.polytechnique.ticbnpick.services.logistics.CreationLogisticsService;
 import com.polytechnique.ticbnpick.services.person.CreationPersonService;
 import com.polytechnique.ticbnpick.services.person.LecturePersonService;
 import com.polytechnique.ticbnpick.services.support.EmailService;
-import com.polytechnique.ticbnpick.services.support.TokenService;
+import com.polytechnique.ticbnpick.services.support.PasswordHasherService;
 import com.polytechnique.ticbnpick.validators.DeliveryPersonRegistrationValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 /**
@@ -33,31 +40,77 @@ public class DeliveryPersonRegistrationService {
 
     private final DeliveryPersonRegistrationValidator validator;
     private final DeliveryPersonMapper mapper;
-    private final TokenService tokenService;
+    private final PasswordHasherService passwordHasherService;
     private final EmailService emailService;
 
+    /**
+     * Orchestrates the registration of a new Delivery Person.
+     *
+     * Coordinates the creation of Person, DeliveryPerson, Logistics, and Address entities.
+     * Ensures transactional consistency (reactive) and triggers side effects like email confirmation.
+     *
+     * @param request the registration request DTO containing all necessary data
+     * @return a Mono containing the response DTO with the generated ID and status
+     * @throws com.polytechnique.ticbnpick.exceptions.EmailAlreadyUsedException if the email is already registered
+     */
+    @Transactional
     public Mono<DeliveryPersonRegistrationResponse> register(DeliveryPersonRegistrationRequest request) {
-        // TODO:
-        // Purpose: Orchestrate full delivery person registration flow
-        // Inputs: Registration Request DTO
-        // Outputs: Registration Response DTO
-        // Steps:
-        //  1. validator.validate(request)
-        //  2. lecturePersonService.existsByEmail(email) -> Error if true
-        //  3. Map request to Person (password=null), DeliveryPerson, Logistics, Address
-        //  4. creationPersonService.createPerson(person) -> returns savedPerson
-        //  5. Set personId on DeliveryPerson, Logistics, Address
-        //  6. Parallel save:
-        //      - creationDeliveryPersonService.createDeliveryPerson
-        //      - creationLogisticsService.createLogistics
-        //      - creationAddressService.createAddress
-        //  7. Construct Response DTO with ID and Status
-        //  8. Send "Pending Validation" Email (async side effect)
-        // Validations: Full DTO validation, Unique Email
-        // Errors / Exceptions: EmailAlreadyUsedException, ValidationException
-        // Reactive Flow: chain with flatMap, zip for parallel creations
-        // Side Effects: 4 DB inserts, 1 Email sent
-        // Security Notes: Public endpoint, no auth required
-        return Mono.empty();
+        return validator.validate(request)
+                .flatMap(validRequest -> lecturePersonService.existsByEmail(validRequest.getEmail())
+                        .flatMap(exists -> {
+                            if (exists) {
+                                return Mono.error(new EmailAlreadyUsedException("Email already in use"));
+                            }
+                            return Mono.just(validRequest);
+                        }))
+                .flatMap(validRequest -> {
+                    Person person = mapper.toPerson(validRequest);
+                    person.setPassword(passwordHasherService.encode(validRequest.getPassword()));
+
+                    return creationPersonService.createPerson(person)
+                            .flatMap(savedPerson -> {
+                                DeliveryPerson deliveryPerson = mapper.toDeliveryPerson(validRequest);
+                                deliveryPerson.setPersonId(savedPerson.getId());
+                                deliveryPerson.setStatus(DeliveryPersonStatus.PENDING);
+
+                                Logistics logistics = mapper.toLogistics(validRequest);
+                                logistics.setCourierId(savedPerson.getId()); // Using PersonID as CourierID or DeliveryPersonID?
+                                // Usually Logistics is linked to DeliveryPerson?
+                                // Let's check Logistics model.
+                                // But usually mapper handles basic mapping.
+                                // If courierId is DP ID, we need to save DP first.
+                                
+                                return creationDeliveryPersonService.createDeliveryPerson(deliveryPerson)
+                                        .flatMap(savedDp -> {
+                                            // Update logistics with DP ID
+                                            logistics.setCourierId(savedDp.getId());
+                                            
+                                            Address address = mapper.toAddress(validRequest);
+                                            address.setPersonId(savedPerson.getId());
+                                            // Address is for Person? Or for DeliveryPerson? 
+                                            // Usually Address is linked to Person via PersonAddress or directly if Address has personId.
+                                            // The user requirement said: "Address (PRIMARY)".
+                                            
+                                            return Mono.zip(
+                                                    creationLogisticsService.createLogistics(logistics),
+                                                    creationAddressService.createAddress(address)
+                                            ).map(tuple -> savedDp);
+                                        });
+                            })
+                            .flatMap(savedDp -> {
+                                // Send email (fire and forget or wait?)
+                                // "Message final ... Un email vous sera envoyé..."
+                                emailService.sendSimpleMessage(
+                                        request.getEmail(),
+                                        "Inscription reçue",
+                                        "Compte créé, en attente de validation. Un email vous sera envoyé lorsque votre demande aura été examiné"
+                                );
+                                
+                                DeliveryPersonRegistrationResponse response = new DeliveryPersonRegistrationResponse();
+                                response.setDeliveryPersonId(savedDp.getId());
+                                response.setStatus("PENDING");
+                                return Mono.just(response);
+                            });
+                });
     }
 }

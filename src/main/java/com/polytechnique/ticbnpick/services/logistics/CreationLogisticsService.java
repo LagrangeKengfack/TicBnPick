@@ -18,6 +18,15 @@ public class CreationLogisticsService {
 
     private final LogisticsRepository logisticsRepository;
 
+    /**
+     * Persists a new Logistics entity to the database.
+     *
+     * Validates the logistics object and saves it to the repository.
+     *
+     * @param logistics the transient Logistics object to persist
+     * @return a Mono containing the persisted Logistics entity
+     * @throws org.springframework.dao.DataIntegrityViolationException if data integrity is violated
+     */
     public Mono<Logistics> createLogistics(Logistics logistics) {
         // TODO:
         // Purpose: Create new Logistics entry

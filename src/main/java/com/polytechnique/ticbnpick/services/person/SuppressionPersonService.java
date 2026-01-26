@@ -19,6 +19,14 @@ public class SuppressionPersonService {
 
     private final PersonRepository personRepository;
 
+    /**
+     * Deletes a Person by their unique identifier.
+     *
+     * Removes the Person record from the repository.
+     *
+     * @param id the UUID of the person to delete
+     * @return a Mono<Void> signaling completion
+     */
     public Mono<Void> deleteById(UUID id) {
         // TODO:
         // Purpose: Delete a Person by ID

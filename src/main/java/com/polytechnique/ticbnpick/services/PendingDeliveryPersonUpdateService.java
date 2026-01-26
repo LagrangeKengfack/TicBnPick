@@ -21,6 +21,15 @@ public class PendingDeliveryPersonUpdateService {
 
     private final PendingDeliveryPersonUpdateRepository repository;
 
+    /**
+     * Saves a pending delivery person update request.
+     *
+     * Validates and persists the update request to the repository.
+     *
+     * @param update the PendingDeliveryPersonUpdate entity to save
+     * @return a Mono containing the saved entity
+     * @throws com.polytechnique.ticbnpick.exceptions.DatabaseException if save fails
+     */
     public Mono<PendingDeliveryPersonUpdate> save(PendingDeliveryPersonUpdate update) {
         // TODO:
         // Purpose: Save a pending update request
@@ -37,6 +46,12 @@ public class PendingDeliveryPersonUpdateService {
         return repository.save(update);
     }
 
+    /**
+     * Finds a pending update by its unique identifier.
+     *
+     * @param id the UUID of the pending update
+     * @return a Mono containing the entity if found, or empty
+     */
     public Mono<PendingDeliveryPersonUpdate> findById(UUID id) {
         // TODO:
         // Purpose: Retrieve a pending update by ID

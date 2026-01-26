@@ -15,6 +15,14 @@ public class PasswordHasherService {
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
+    /**
+     * Encodes a raw password using BCrypt.
+     *
+     * Applies a secure one-way hash to the password for storage.
+     *
+     * @param rawPassword the plain text password
+     * @return the BCrypt hashed password string
+     */
     public String encode(String rawPassword) {
         // TODO:
         // Purpose: Hash password with BCrypt

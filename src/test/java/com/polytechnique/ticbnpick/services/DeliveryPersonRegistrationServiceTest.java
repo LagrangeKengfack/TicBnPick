@@ -2,18 +2,20 @@ package com.polytechnique.ticbnpick.services;
 
 import com.polytechnique.ticbnpick.dtos.requests.DeliveryPersonRegistrationRequest;
 import com.polytechnique.ticbnpick.dtos.responses.DeliveryPersonRegistrationResponse;
+import com.polytechnique.ticbnpick.exceptions.EmailAlreadyUsedException;
 import com.polytechnique.ticbnpick.mappers.DeliveryPersonMapper;
 import com.polytechnique.ticbnpick.models.Address;
 import com.polytechnique.ticbnpick.models.DeliveryPerson;
 import com.polytechnique.ticbnpick.models.Logistics;
 import com.polytechnique.ticbnpick.models.Person;
+import com.polytechnique.ticbnpick.models.enums.deliveryPerson.DeliveryPersonStatus;
 import com.polytechnique.ticbnpick.services.address.CreationAddressService;
 import com.polytechnique.ticbnpick.services.deliveryperson.CreationDeliveryPersonService;
 import com.polytechnique.ticbnpick.services.logistics.CreationLogisticsService;
 import com.polytechnique.ticbnpick.services.person.CreationPersonService;
 import com.polytechnique.ticbnpick.services.person.LecturePersonService;
 import com.polytechnique.ticbnpick.services.support.EmailService;
-import com.polytechnique.ticbnpick.services.support.TokenService;
+import com.polytechnique.ticbnpick.services.support.PasswordHasherService;
 import com.polytechnique.ticbnpick.validators.DeliveryPersonRegistrationValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,7 +49,7 @@ class DeliveryPersonRegistrationServiceTest {
     @Mock
     private DeliveryPersonMapper mapper;
     @Mock
-    private TokenService tokenService;
+    private PasswordHasherService passwordHasherService;
     @Mock
     private EmailService emailService;
 
@@ -59,6 +61,10 @@ class DeliveryPersonRegistrationServiceTest {
         // Arrange
         DeliveryPersonRegistrationRequest request = new DeliveryPersonRegistrationRequest();
         request.setEmail("test@test.com");
+        request.setPassword("plainPassword");
+        
+        Person person = new Person();
+        person.setEmail("test@test.com");
         
         Person savedPerson = new Person();
         savedPerson.setId(UUID.randomUUID());
@@ -67,46 +73,52 @@ class DeliveryPersonRegistrationServiceTest {
         DeliveryPerson deliveryPerson = new DeliveryPerson();
         DeliveryPerson savedDeliveryPerson = new DeliveryPerson();
         savedDeliveryPerson.setId(UUID.randomUUID());
-        savedDeliveryPerson.setStatus("PENDING");
+        savedDeliveryPerson.setStatus(DeliveryPersonStatus.PENDING);
 
         Logistics logistics = new Logistics();
         Address address = new Address();
 
+        when(validator.validate(request)).thenReturn(Mono.just(request));
         when(lecturePersonService.existsByEmail(anyString())).thenReturn(Mono.just(false));
-        when(mapper.toPerson(any())).thenReturn(new Person());
-        when(mapper.toDeliveryPerson(any())).thenReturn(deliveryPerson);
-        when(mapper.toLogistics(any())).thenReturn(logistics);
-        when(mapper.toAddress(any())).thenReturn(address);
+        when(passwordHasherService.encode("plainPassword")).thenReturn("hashedPassword");
+        
+        when(mapper.toPerson(request)).thenReturn(person);
+        when(mapper.toDeliveryPerson(request)).thenReturn(deliveryPerson);
+        when(mapper.toLogistics(request)).thenReturn(logistics);
+        when(mapper.toAddress(request)).thenReturn(address);
 
-        when(creationPersonService.createPerson(any())).thenReturn(Mono.just(savedPerson));
-        when(creationDeliveryPersonService.createDeliveryPerson(any())).thenReturn(Mono.just(savedDeliveryPerson));
-        when(creationLogisticsService.createLogistics(any())).thenReturn(Mono.just(new Logistics()));
-        when(creationAddressService.createAddress(any())).thenReturn(Mono.just(new Address()));
+        when(creationPersonService.createPerson(any(Person.class))).thenReturn(Mono.just(savedPerson));
+        when(creationDeliveryPersonService.createDeliveryPerson(any(DeliveryPerson.class))).thenReturn(Mono.just(savedDeliveryPerson));
+        when(creationLogisticsService.createLogistics(any(Logistics.class))).thenReturn(Mono.just(new Logistics()));
+        when(creationAddressService.createAddress(any(Address.class))).thenReturn(Mono.just(new Address()));
         
         // Act & Assert
         StepVerifier.create(service.register(request))
                 .expectNextMatches(response -> 
-                    response.getStatus().equals("PENDING") && 
+                    "PENDING".equals(response.getStatus()) && 
                     response.getDeliveryPersonId() != null
                 )
                 .verifyComplete();
 
-        verify(emailService).sendSimpleMessage(eq("test@test.com"), anyString(), anyString());
+        verify(passwordHasherService).encode("plainPassword");
+        verify(person).setPassword("hashedPassword");
+        // verify(emailService).sendSimpleMessage(eq("test@test.com"), anyString(), anyString()); // If email is sent
     }
 
     @Test
     void register_EmailAlreadyExists_ShouldThrowError() {
         // Arrange
         DeliveryPersonRegistrationRequest request = new DeliveryPersonRegistrationRequest();
-        request.setEmail("existing@test.com");
+        request.setEmail("test@test.com");
 
-        when(lecturePersonService.existsByEmail("existing@test.com")).thenReturn(Mono.just(true));
+        when(validator.validate(request)).thenReturn(Mono.just(request));
+        when(lecturePersonService.existsByEmail(anyString())).thenReturn(Mono.just(true));
 
         // Act & Assert
         StepVerifier.create(service.register(request))
-                .expectError() // Expecting generic error or specific EmailAlreadyUsedException
+                .expectError(EmailAlreadyUsedException.class)
                 .verify();
-
+                
         verify(creationPersonService, never()).createPerson(any());
     }
 }

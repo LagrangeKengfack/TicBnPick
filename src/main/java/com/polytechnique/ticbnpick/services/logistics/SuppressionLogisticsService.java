@@ -19,6 +19,14 @@ public class SuppressionLogisticsService {
 
     private final LogisticsRepository logisticsRepository;
 
+    /**
+     * Deletes a Logistics entry by its unique identifier.
+     *
+     * Removes the Logistics record from the repository.
+     *
+     * @param id the UUID of the logistics entry to delete
+     * @return a Mono<Void> signaling completion
+     */
     public Mono<Void> deleteById(UUID id) {
         // TODO:
         // Purpose: Delete Logistics by ID

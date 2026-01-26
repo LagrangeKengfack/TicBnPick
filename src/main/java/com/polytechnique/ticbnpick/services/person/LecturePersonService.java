@@ -20,6 +20,14 @@ public class LecturePersonService {
 
     private final PersonRepository personRepository;
 
+    /**
+     * Retrieves a Person by their unique identifier.
+     *
+     * Queries the repository for a Person with the specified ID.
+     *
+     * @param id the UUID of the person to retrieve
+     * @return a Mono containing the Person if found, or empty if not
+     */
     public Mono<Person> findById(UUID id) {
         // TODO:
         // Purpose: Retrieve a Person by ID
@@ -50,6 +58,14 @@ public class LecturePersonService {
         return personRepository.findByEmail(email);
     }
 
+    /**
+     * Checks if a Person exists with the given email.
+     *
+     * Uses the repository to verify the existence of the email.
+     *
+     * @param email the email address to check
+     * @return a Mono emitting true if exists, false otherwise
+     */
     public Mono<Boolean> existsByEmail(String email) {
         // TODO:
         // Purpose: Check existence of Person by Email

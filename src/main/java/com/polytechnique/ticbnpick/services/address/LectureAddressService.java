@@ -20,6 +20,14 @@ public class LectureAddressService {
 
     private final AddressRepository addressRepository;
 
+    /**
+     * Retrieves an Address by its unique identifier.
+     *
+     * Queries the repository for an Address with the specified ID.
+     *
+     * @param id the UUID of the address to retrieve
+     * @return a Mono containing the Address if found, or empty if not
+     */
     public Mono<Address> findById(UUID id) {
         // TODO:
         // Purpose: Retrieve Address by ID

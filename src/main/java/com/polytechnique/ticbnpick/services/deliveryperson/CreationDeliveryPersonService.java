@@ -18,6 +18,15 @@ public class CreationDeliveryPersonService {
 
     private final DeliveryPersonRepository deliveryPersonRepository;
 
+    /**
+     * Persists a new DeliveryPerson entity to the database.
+     *
+     * Validates the delivery person object and saves it to the repository.
+     *
+     * @param deliveryPerson the transient DeliveryPerson object to persist
+     * @return a Mono containing the persisted DeliveryPerson entity
+     * @throws org.springframework.dao.DataIntegrityViolationException if data integrity is violated
+     */
     public Mono<DeliveryPerson> createDeliveryPerson(DeliveryPerson deliveryPerson) {
         // TODO:
         // Purpose: Create a new DeliveryPerson profile

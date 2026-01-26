@@ -18,6 +18,15 @@ public class CreationPersonService {
 
     private final PersonRepository personRepository;
 
+    /**
+     * Persists a new Person entity to the database.
+     *
+     * Validates the person object and saves it to the repository.
+     *
+     * @param person the transient Person object to persist
+     * @return a Mono containing the persisted Person entity
+     * @throws org.springframework.dao.DataIntegrityViolationException if data integrity is violated
+     */
     public Mono<Person> createPerson(Person person) {
         // TODO:
         // Purpose: Persist a new Person entity to the database

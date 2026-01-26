@@ -21,6 +21,14 @@ public class LectureLogisticsService {
 
     private final LogisticsRepository logisticsRepository;
 
+    /**
+     * Retrieves a Logistics entry by its unique identifier.
+     *
+     * Queries the repository for a Logistics entry with the specified ID.
+     *
+     * @param id the UUID of the logistics entry to retrieve
+     * @return a Mono containing the Logistics if found, or empty if not
+     */
     public Mono<Logistics> findById(UUID id) {
         // TODO:
         // Purpose: Retrieve Logistics by ID
@@ -36,6 +44,14 @@ public class LectureLogisticsService {
         return logisticsRepository.findById(id);
     }
 
+    /**
+     * Retrieves all Logistics entries associated with a specific courier.
+     *
+     * Queries the repository for all logistics entries linked to the courier's ID.
+     *
+     * @param courierId the UUID of the courier
+     * @return a Flux containing the Logistics entries found
+     */
     public Flux<Logistics> findAllByCourierId(UUID courierId) {
         // TODO:
         // Purpose: Retrieve all Logistics for a courier

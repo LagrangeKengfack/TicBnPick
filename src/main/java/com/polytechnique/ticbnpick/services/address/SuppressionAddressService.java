@@ -19,6 +19,14 @@ public class SuppressionAddressService {
 
     private final AddressRepository addressRepository;
 
+    /**
+     * Deletes an Address by its unique identifier.
+     *
+     * Removes the Address record from the repository.
+     *
+     * @param id the UUID of the address to delete
+     * @return a Mono<Void> signaling completion
+     */
     public Mono<Void> deleteById(UUID id) {
         // TODO:
         // Purpose: Delete Address by ID

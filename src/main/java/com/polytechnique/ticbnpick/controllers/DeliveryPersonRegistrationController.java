@@ -26,6 +26,14 @@ public class DeliveryPersonRegistrationController {
 
     private final DeliveryPersonRegistrationService registrationService;
 
+    /**
+     * Endpoint for public registration of a new delivery person.
+     *
+     * Accepts registration data, validates it, and initiates the registration process.
+     *
+     * @param request the registration request body
+     * @return a Mono<ResponseEntity<DeliveryPersonRegistrationResponse>> with status 201 Created
+     */
     @PostMapping("/register")
     public Mono<ResponseEntity<DeliveryPersonRegistrationResponse>> register(
             @Valid @RequestBody DeliveryPersonRegistrationRequest request) {

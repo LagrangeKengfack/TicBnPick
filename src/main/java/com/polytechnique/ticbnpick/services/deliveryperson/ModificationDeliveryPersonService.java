@@ -18,6 +18,15 @@ public class ModificationDeliveryPersonService {
 
     private final DeliveryPersonRepository deliveryPersonRepository;
 
+    /**
+     * Updates an existing DeliveryPerson entity in the database.
+     *
+     * Saves the provided DeliveryPerson object, updating the existing record based on ID.
+     *
+     * @param deliveryPerson the DeliveryPerson object with updated fields
+     * @return a Mono containing the updated DeliveryPerson entity
+     * @throws org.springframework.dao.OptimisticLockingFailureException if version mismatch occurs
+     */
     public Mono<DeliveryPerson> updateDeliveryPerson(DeliveryPerson deliveryPerson) {
         // TODO:
         // Purpose: Update DeliveryPerson details

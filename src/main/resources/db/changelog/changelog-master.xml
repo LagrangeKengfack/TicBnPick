@@ -99,6 +99,13 @@
                 relativeToChangelogFile="false"/>
     </changeSet>
 
+    <changeSet id="016-cleanup-schema" author="TiiBnPickTeam">
+        <validCheckSum>ANY</validCheckSum>
+        <sqlFile
+                path="db/changelog/cleanup-schema.sql"
+                relativeToChangelogFile="false"/>
+    </changeSet>
+
     <changeSet id="014-create-comment" author="TiiBnPickTeam">
         <validCheckSum>ANY</validCheckSum>
         <sqlFile
