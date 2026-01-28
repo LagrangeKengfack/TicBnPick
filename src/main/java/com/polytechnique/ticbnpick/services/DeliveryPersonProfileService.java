@@ -1,12 +1,7 @@
 package com.polytechnique.ticbnpick.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.polytechnique.ticbnpick.dtos.requests.DeliveryPersonUpdateRequest;
 import com.polytechnique.ticbnpick.models.DeliveryPerson;
-import com.polytechnique.ticbnpick.models.Logistics;
-import com.polytechnique.ticbnpick.models.PendingDeliveryPersonUpdate;
-import com.polytechnique.ticbnpick.models.Person;
 import com.polytechnique.ticbnpick.models.enums.logistics.LogisticsClass;
 import com.polytechnique.ticbnpick.models.enums.logistics.LogisticsType;
 import com.polytechnique.ticbnpick.services.deliveryperson.LectureDeliveryPersonService;
@@ -19,11 +14,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Service to handle high-level delivery person profile updates.
+ * Service to handle delivery person profile updates.
+ *
+ * <p>Orchestrates updates to DeliveryPerson, Person, and Logistics entities
+ * based on the fields provided in the update request. All updates are applied
+ * directly without admin validation.
  *
  * @author Kengfack Lagrange
  * @date 25/01/2026
@@ -38,79 +36,92 @@ public class DeliveryPersonProfileService {
     private final ModificationLogisticsService modificationLogisticsService;
     private final LecturePersonService lecturePersonService;
     private final ModificationPersonService modificationPersonService;
-    private final PendingDeliveryPersonUpdateService pendingUpdateService;
-    private final ObjectMapper objectMapper;
 
+    /**
+     * Updates a delivery person's profile with the provided data.
+     *
+     * <p>Applies all provided field updates directly to the corresponding entities:
+     * <ul>
+     *   <li>Person fields: phone</li>
+     *   <li>DeliveryPerson fields: commercialName, commercialRegister</li>
+     *   <li>Logistics fields: plateNumber, color, logisticsClass, logisticsType, logisticImage, etc.</li>
+     * </ul>
+     *
+     * @param deliveryPersonId the UUID of the delivery person to update
+     * @param request the update request containing the fields to modify
+     * @return a Mono&lt;Void&gt; signaling completion
+     */
     public Mono<Void> updateProfile(UUID deliveryPersonId, DeliveryPersonUpdateRequest request) {
         return lectureDeliveryPersonService.findById(deliveryPersonId)
                 .flatMap(dp -> {
-                    boolean sensitiveChanged = isSensitiveChanged(request);
+                    Mono<Void> updatePerson = updatePersonFields(dp, request);
+                    Mono<Void> updateDeliveryPerson = updateDeliveryPersonFields(dp, request);
+                    Mono<Void> updateLogistics = updateLogisticsFields(dp.getId(), request);
 
-                    Mono<Void> updateNonSensitive = updateNonSensitiveFields(dp, request);
-                    Mono<Void> handleSensitive = sensitiveChanged ? createPendingUpdate(dp.getId(), request) : Mono.empty();
-
-                    return updateNonSensitive.then(handleSensitive);
+                    return Mono.when(updatePerson, updateDeliveryPerson, updateLogistics);
                 });
     }
 
-    private boolean isSensitiveChanged(DeliveryPersonUpdateRequest request) {
-        return request.getCommercialRegister() != null ||
-               request.getLogisticsType() != null ||
-               request.getLogisticImage() != null;
-    }
-
-    private Mono<Void> createPendingUpdate(UUID deliveryPersonId, DeliveryPersonUpdateRequest request) {
-        try {
-            PendingDeliveryPersonUpdate update = new PendingDeliveryPersonUpdate();
-            update.setDeliveryPersonId(deliveryPersonId);
-            update.setStatus("PENDING");
-            update.setCreatedAt(Instant.now());
-            // Create a JSON containing ONLY the sensitive fields to be approved?
-            // Or the whole request?
-            // User says "Modification -> creation PendingDeliveryPersonUpdate".
-            // I'll store the whole request for simplicity or just the sensitive parts.
-            // Let's store the request as is.
-            update.setNewDataJson(objectMapper.writeValueAsString(request));
-            return pendingUpdateService.save(update).then();
-        } catch (JsonProcessingException e) {
-            return Mono.error(new RuntimeException("Error serializing update request", e));
-        }
-    }
-
-    private Mono<Void> updateNonSensitiveFields(DeliveryPerson dp, DeliveryPersonUpdateRequest request) {
-        // Update Person fields (phone, etc.)
-        Mono<Void> updatePerson = lecturePersonService.findById(dp.getPersonId())
+    /**
+     * Updates Person entity fields from the request.
+     *
+     * @param dp the delivery person entity (for personId)
+     * @param request the update request
+     * @return a Mono&lt;Void&gt; signaling completion
+     */
+    private Mono<Void> updatePersonFields(DeliveryPerson dp, DeliveryPersonUpdateRequest request) {
+        return lecturePersonService.findById(dp.getPersonId())
                 .flatMap(person -> {
                     boolean changed = false;
                     if (request.getPhone() != null) {
                         person.setPhone(request.getPhone());
                         changed = true;
                     }
-                    // Add other person fields if needed
+
                     if (changed) {
                         return modificationPersonService.updatePerson(person).then();
                     }
                     return Mono.empty();
                 });
+    }
 
-        // Update DeliveryPerson non-sensitive fields
-        Mono<Void> updateDP = Mono.defer(() -> {
-            boolean changed = false;
-            if (request.getCommercialName() != null) {
-                dp.setCommercialName(request.getCommercialName());
-                changed = true;
-            }
-            // other fields
-            if (changed) {
-                return modificationDeliveryPersonService.updateDeliveryPerson(dp).then();
-            }
-            return Mono.empty();
-        });
+    /**
+     * Updates DeliveryPerson entity fields from the request.
+     *
+     * @param dp the delivery person entity
+     * @param request the update request
+     * @return a Mono&lt;Void&gt; signaling completion
+     */
+    private Mono<Void> updateDeliveryPersonFields(DeliveryPerson dp, DeliveryPersonUpdateRequest request) {
+        boolean changed = false;
+        
+        if (request.getCommercialName() != null) {
+            dp.setCommercialName(request.getCommercialName());
+            changed = true;
+        }
+        if (request.getCommercialRegister() != null) {
+            dp.setCommercialRegister(request.getCommercialRegister());
+            changed = true;
+        }
 
-        // Update Logistics non-sensitive fields
-        Mono<Void> updateLogistics = lectureLogisticsService.findByDeliveryPersonId(dp.getId())
+        if (changed) {
+            return modificationDeliveryPersonService.updateDeliveryPerson(dp).then();
+        }
+        return Mono.empty();
+    }
+
+    /**
+     * Updates Logistics entity fields from the request.
+     *
+     * @param deliveryPersonId the UUID of the delivery person
+     * @param request the update request
+     * @return a Mono&lt;Void&gt; signaling completion
+     */
+    private Mono<Void> updateLogisticsFields(UUID deliveryPersonId, DeliveryPersonUpdateRequest request) {
+        return lectureLogisticsService.findByDeliveryPersonId(deliveryPersonId)
                 .flatMap(logistics -> {
                     boolean changed = false;
+
                     if (request.getPlateNumber() != null) {
                         logistics.setPlateNumber(request.getPlateNumber());
                         changed = true;
@@ -123,13 +134,32 @@ public class DeliveryPersonProfileService {
                         logistics.setLogisticsClass(LogisticsClass.fromValue(request.getLogisticsClass()));
                         changed = true;
                     }
-                    // other fields
+                    if (request.getLogisticsType() != null) {
+                        logistics.setLogisticsType(LogisticsType.fromValue(request.getLogisticsType()));
+                        changed = true;
+                    }
+                    if (request.getLogisticImage() != null) {
+                        logistics.setLogisticImage(request.getLogisticImage());
+                        changed = true;
+                    }
+                    if (request.getTankCapacity() != null) {
+                        logistics.setTankCapacity(request.getTankCapacity());
+                        changed = true;
+                    }
+                    if (request.getLuggageMaxCapacity() != null) {
+                        logistics.setLuggageMaxCapacity(request.getLuggageMaxCapacity());
+                        changed = true;
+                    }
+                    if (request.getTotalSeatNumber() != null) {
+                        logistics.setTotalSeatNumber(request.getTotalSeatNumber());
+                        changed = true;
+                    }
+
                     if (changed) {
                         return modificationLogisticsService.updateLogistics(logistics).then();
                     }
                     return Mono.empty();
-                });
-
-        return Mono.when(updatePerson, updateDP, updateLogistics);
+                })
+                .switchIfEmpty(Mono.empty());
     }
 }

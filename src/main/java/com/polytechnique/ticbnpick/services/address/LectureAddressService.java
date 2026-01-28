@@ -23,23 +23,12 @@ public class LectureAddressService {
     /**
      * Retrieves an Address by its unique identifier.
      *
-     * Queries the repository for an Address with the specified ID.
+     * <p>Queries the repository for an Address with the specified ID.
      *
      * @param id the UUID of the address to retrieve
      * @return a Mono containing the Address if found, or empty if not
      */
     public Mono<Address> findById(UUID id) {
-        // TODO:
-        // Purpose: Retrieve Address by ID
-        // Inputs: UUID id
-        // Outputs: Mono<Address>
-        // Steps:
-        //  1. Call addressRepository.findById(id)
-        // Validations: id not null
-        // Errors / Exceptions: Mono.empty() if not found
-        // Reactive Flow: Simple Mono pipeline
-        // Side Effects: None
-        // Security Notes: None
         return addressRepository.findById(id);
     }
 }

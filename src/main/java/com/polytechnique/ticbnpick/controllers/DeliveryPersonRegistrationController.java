@@ -16,6 +16,10 @@ import reactor.core.publisher.Mono;
 /**
  * Controller for delivery person registration.
  *
+ * <p>Provides public endpoint for new delivery person registration.
+ * After successful registration, the account is in PENDING status
+ * awaiting admin validation.
+ *
  * @author Kengfack Lagrange
  * @date 19/12/2025
  */
@@ -27,17 +31,18 @@ public class DeliveryPersonRegistrationController {
     private final DeliveryPersonRegistrationService registrationService;
 
     /**
-     * Endpoint for public registration of a new delivery person.
+     * Registers a new delivery person.
      *
-     * Accepts registration data, validates it, and initiates the registration process.
+     * <p>Accepts registration data, validates it, and creates the delivery person
+     * with all related entities (Person, DeliveryPerson, Logistics, Address).
+     * Sends a confirmation email and publishes a Kafka event.
      *
-     * @param request the registration request body
-     * @return a Mono<ResponseEntity<DeliveryPersonRegistrationResponse>> with status 201 Created
+     * @param request the registration request body containing all required data
+     * @return a Mono&lt;ResponseEntity&lt;DeliveryPersonRegistrationResponse&gt;&gt; with status 201 Created
      */
     @PostMapping("/register")
     public Mono<ResponseEntity<DeliveryPersonRegistrationResponse>> register(
             @Valid @RequestBody DeliveryPersonRegistrationRequest request) {
-        // TODO: Call service to register delivery person
         return registrationService.register(request)
                 .map(response -> ResponseEntity.status(HttpStatus.CREATED).body(response));
     }

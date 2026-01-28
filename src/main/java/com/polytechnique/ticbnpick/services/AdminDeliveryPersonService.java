@@ -1,20 +1,13 @@
 package com.polytechnique.ticbnpick.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.polytechnique.ticbnpick.dtos.requests.AdminDeliveryPersonValidationRequest;
-import com.polytechnique.ticbnpick.dtos.requests.DeliveryPersonUpdateRequest;
 import com.polytechnique.ticbnpick.dtos.responses.DeliveryPersonDetailsResponse;
 import com.polytechnique.ticbnpick.events.DeliveryPersonValidatedEvent;
 import com.polytechnique.ticbnpick.exceptions.DeliveryPersonNotFoundException;
 import com.polytechnique.ticbnpick.exceptions.ForbiddenOperationException;
-import com.polytechnique.ticbnpick.exceptions.NotFoundException;
 import com.polytechnique.ticbnpick.models.enums.deliveryPerson.DeliveryPersonStatus;
-import com.polytechnique.ticbnpick.models.enums.logistics.LogisticsType;
 import com.polytechnique.ticbnpick.services.deliveryperson.LectureDeliveryPersonService;
 import com.polytechnique.ticbnpick.services.deliveryperson.ModificationDeliveryPersonService;
-import com.polytechnique.ticbnpick.services.logistics.LectureLogisticsService;
-import com.polytechnique.ticbnpick.services.logistics.ModificationLogisticsService;
 import com.polytechnique.ticbnpick.services.person.LecturePersonService;
 import com.polytechnique.ticbnpick.services.support.EmailService;
 import com.polytechnique.ticbnpick.services.support.KafkaEventPublisher;
@@ -27,6 +20,13 @@ import java.util.UUID;
 
 /**
  * Orchestrator service for Admin operations on DeliveryPersons.
+ * 
+ * <p>Handles administrative actions including:
+ * <ul>
+ *   <li>Validation of new delivery person registrations (APPROVED/REJECTED)</li>
+ *   <li>Suspension of active delivery person accounts</li>
+ *   <li>Revocation (permanent deactivation) of delivery person accounts</li>
+ * </ul>
  *
  * @author Kengfack Lagrange
  * @date 19/12/2025
@@ -39,23 +39,20 @@ public class AdminDeliveryPersonService {
     private final LectureDeliveryPersonService lectureDeliveryPersonService;
     private final ModificationDeliveryPersonService modificationDeliveryPersonService;
     private final LecturePersonService lecturePersonService;
-    private final LectureLogisticsService lectureLogisticsService;
-    private final ModificationLogisticsService modificationLogisticsService;
-    private final PendingDeliveryPersonUpdateService pendingUpdateService;
     private final EmailService emailService;
     private final KafkaEventPublisher kafkaEventPublisher;
-    private final ObjectMapper objectMapper;
 
     /**
      * Validates or rejects a delivery person registration application.
      *
-     * Updates the status of the delivery person. If approved, sends an approval email.
-     * If rejected, sends a rejection notice.
+     * <p>Updates the status of the delivery person based on admin decision.
+     * If approved, sends an approval email and publishes a Kafka event.
+     * If rejected, sends a rejection notice with optional reason.
      *
-     * @param request the validation request containing the ID and decision
-     * @return a Mono<Void> signaling completion
-     * @throws DeliveryPersonNotFoundException if the ID is invalid
-     * @throws ForbiddenOperationException if status is not PENDING
+     * @param request the validation request containing the delivery person ID and decision
+     * @return a Mono&lt;Void&gt; signaling completion
+     * @throws DeliveryPersonNotFoundException if the delivery person ID is invalid
+     * @throws ForbiddenOperationException if the delivery person status is not PENDING
      */
     public Mono<Void> validateRegistration(AdminDeliveryPersonValidationRequest request) {
         return lectureDeliveryPersonService.findById(request.getDeliveryPersonId())
@@ -70,9 +67,7 @@ public class AdminDeliveryPersonService {
                         return modificationDeliveryPersonService.updateDeliveryPerson(dp)
                                 .flatMap(updated -> lecturePersonService.findById(updated.getPersonId())
                                         .doOnNext(person -> {
-                                            // Send approval email
                                             emailService.sendAccountApproved(person.getEmail());
-                                            // Publish Kafka event
                                             kafkaEventPublisher.publishDeliveryPersonValidated(
                                                     new DeliveryPersonValidatedEvent(updated.getId(), true)
                                             );
@@ -85,9 +80,7 @@ public class AdminDeliveryPersonService {
                         return modificationDeliveryPersonService.updateDeliveryPerson(dp)
                                 .flatMap(updated -> lecturePersonService.findById(updated.getPersonId())
                                         .doOnNext(person -> {
-                                            // Send rejection email
                                             emailService.sendAccountRejected(person.getEmail(), request.getReason());
-                                            // Publish Kafka event
                                             kafkaEventPublisher.publishDeliveryPersonValidated(
                                                     new DeliveryPersonValidatedEvent(updated.getId(), false)
                                             );
@@ -101,69 +94,78 @@ public class AdminDeliveryPersonService {
     }
 
     /**
-     * Reviews and applies a pending profile update.
+     * Suspends an active delivery person account.
      *
-     * If approved, applies the JSON changes to the entity and notifies the user.
-     * If rejected, updates the request status and notifies the user.
+     * <p>Changes the delivery person status to SUSPENDED and sends a notification email.
+     * Only APPROVED accounts can be suspended.
      *
-     * @param updateId the UUID of the pending update request
-     * @param approved boolean indicating approval or rejection
-     * @param reason optional reason for the decision
-     * @return a Mono<Void> signaling completion
-     * @throws NotFoundException if update not found
+     * @param deliveryPersonId the UUID of the delivery person to suspend
+     * @return a Mono&lt;Void&gt; signaling completion
+     * @throws DeliveryPersonNotFoundException if the delivery person ID is invalid
+     * @throws ForbiddenOperationException if the account is not in APPROVED status
      */
-    public Mono<Void> reviewUpdate(UUID updateId, boolean approved, String reason) {
-        return pendingUpdateService.findById(updateId)
-                .switchIfEmpty(Mono.error(new NotFoundException("Pending update not found")))
-                .flatMap(update -> {
-                    if (approved) {
-                        try {
-                            DeliveryPersonUpdateRequest request = objectMapper.readValue(
-                                    update.getNewDataJson(), DeliveryPersonUpdateRequest.class);
-                            
-                            return lectureDeliveryPersonService.findById(update.getDeliveryPersonId())
-                                    .flatMap(dp -> {
-                                        // Apply sensitive changes to DeliveryPerson
-                                        if (request.getCommercialRegister() != null) {
-                                            dp.setCommercialRegister(request.getCommercialRegister());
-                                        }
-                                        
-                                        return modificationDeliveryPersonService.updateDeliveryPerson(dp)
-                                                .flatMap(savedDp -> 
-                                                    lectureLogisticsService.findByDeliveryPersonId(savedDp.getId())
-                                                            .flatMap(logistics -> {
-                                                                if (request.getLogisticsType() != null) {
-                                                                    logistics.setLogisticsType(
-                                                                            LogisticsType.fromValue(request.getLogisticsType()));
-                                                                }
-                                                                if (request.getLogisticImage() != null) {
-                                                                    logistics.setLogisticImage(request.getLogisticImage());
-                                                                }
-                                                                return modificationLogisticsService.updateLogistics(logistics);
-                                                            })
-                                                            .then()
-                                                )
-                                                .then(pendingUpdateService.deleteById(update.getId()));
-                                    });
-                        } catch (JsonProcessingException e) {
-                            return Mono.error(new RuntimeException("Error parsing update data", e));
-                        }
-                    } else {
-                        update.setStatus("REJECTED");
-                        return pendingUpdateService.save(update).then();
+    public Mono<Void> suspendDeliveryPerson(UUID deliveryPersonId) {
+        return lectureDeliveryPersonService.findById(deliveryPersonId)
+                .switchIfEmpty(Mono.error(new DeliveryPersonNotFoundException("Delivery Person not found")))
+                .flatMap(dp -> {
+                    if (dp.getStatus() != DeliveryPersonStatus.APPROVED) {
+                        return Mono.error(new ForbiddenOperationException("Can only suspend APPROVED accounts"));
                     }
-                });
+                    
+                    dp.setStatus(DeliveryPersonStatus.SUSPENDED);
+                    return modificationDeliveryPersonService.updateDeliveryPerson(dp)
+                            .flatMap(updated -> lecturePersonService.findById(updated.getPersonId())
+                                    .doOnNext(person -> {
+                                        emailService.sendAccountSuspended(person.getEmail());
+                                        log.info("Delivery person {} suspended", updated.getId());
+                                    })
+                                    .then()
+                            );
+                })
+                .then();
+    }
+
+    /**
+     * Revokes (permanently deactivates) a delivery person account.
+     *
+     * <p>Changes the delivery person status to REJECTED (permanent revocation) and sends
+     * a notification email. APPROVED or SUSPENDED accounts can be revoked.
+     *
+     * @param deliveryPersonId the UUID of the delivery person to revoke
+     * @return a Mono&lt;Void&gt; signaling completion
+     * @throws DeliveryPersonNotFoundException if the delivery person ID is invalid
+     * @throws ForbiddenOperationException if the account is already REJECTED or PENDING
+     */
+    public Mono<Void> revokeDeliveryPerson(UUID deliveryPersonId) {
+        return lectureDeliveryPersonService.findById(deliveryPersonId)
+                .switchIfEmpty(Mono.error(new DeliveryPersonNotFoundException("Delivery Person not found")))
+                .flatMap(dp -> {
+                    if (dp.getStatus() == DeliveryPersonStatus.PENDING || dp.getStatus() == DeliveryPersonStatus.REJECTED) {
+                        return Mono.error(new ForbiddenOperationException("Cannot revoke PENDING or already REJECTED accounts"));
+                    }
+                    
+                    dp.setStatus(DeliveryPersonStatus.REJECTED);
+                    return modificationDeliveryPersonService.updateDeliveryPerson(dp)
+                            .flatMap(updated -> lecturePersonService.findById(updated.getPersonId())
+                                    .doOnNext(person -> {
+                                        emailService.sendAccountRevoked(person.getEmail());
+                                        log.info("Delivery person {} revoked", updated.getId());
+                                    })
+                                    .then()
+                            );
+                })
+                .then();
     }
 
     /**
      * Retrieves aggregated details of a delivery person for admin view.
      *
-     * Fetches and combines data from Person, DeliveryPerson, Logistics, and Address
-     * services into a single detailed response.
+     * <p>Fetches and combines data from Person and DeliveryPerson entities
+     * into a single detailed response for administrative purposes.
      *
      * @param id the UUID of the delivery person
      * @return a Mono containing the detailed response DTO
-     * @throws DeliveryPersonNotFoundException if not found
+     * @throws DeliveryPersonNotFoundException if the delivery person is not found
      */
     public Mono<DeliveryPersonDetailsResponse> getDeliveryPersonDetails(UUID id) {
         return lectureDeliveryPersonService.findById(id)

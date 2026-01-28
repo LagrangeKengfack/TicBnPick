@@ -14,15 +14,6 @@ import reactor.core.publisher.Mono;
  */
 public interface LogisticsRepository extends ReactiveCrudRepository<Logistics, UUID> {
 
-    /**
-     * Finds all logistics entries by courier ID.
-     *
-     * @param courierId the courier identifier
-     * @return Flux of matching Logistics entries
-     * @deprecated Use {@link #findByDeliveryPersonId(UUID)} instead
-     */
-    @Deprecated
-    Flux<Logistics> findAllByCourierId(UUID courierId);
 
     /**
      * Finds a logistics entry by delivery person ID.

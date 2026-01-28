@@ -21,26 +21,13 @@ public class CreationPersonService {
     /**
      * Persists a new Person entity to the database.
      *
-     * Validates the person object and saves it to the repository.
+     * <p>Validates the person object and saves it to the repository.
      *
      * @param person the transient Person object to persist
      * @return a Mono containing the persisted Person entity
      * @throws org.springframework.dao.DataIntegrityViolationException if data integrity is violated
      */
     public Mono<Person> createPerson(Person person) {
-        // TODO:
-        // Purpose: Persist a new Person entity to the database
-        // Inputs: Person object (transient)
-        // Outputs: Mono<Person> (persisted with ID)
-        // Steps:
-        //  1. Validate Person object (basic checks)
-        //  2. Check if email already exists (should be handled before or catch DuplicateKeyException)
-        //  3. Call personRepository.save(person)
-        // Validations: Non-null fields, email format
-        // Errors / Exceptions: DataIntegrityViolationException if email duplicate
-        // Reactive Flow: Simple Mono pipeline
-        // Side Effects: Database insert
-        // Security Notes: None
         return personRepository.save(person);
     }
 }

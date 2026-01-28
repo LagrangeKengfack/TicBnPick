@@ -22,23 +22,12 @@ public class SuppressionPersonService {
     /**
      * Deletes a Person by their unique identifier.
      *
-     * Removes the Person record from the repository.
+     * <p>Removes the Person record from the repository.
      *
      * @param id the UUID of the person to delete
-     * @return a Mono<Void> signaling completion
+     * @return a Mono&lt;Void&gt; signaling completion
      */
     public Mono<Void> deleteById(UUID id) {
-        // TODO:
-        // Purpose: Delete a Person by ID
-        // Inputs: UUID id
-        // Outputs: Mono<Void>
-        // Steps:
-        //  1. Call personRepository.deleteById(id)
-        // Validations: id not null
-        // Errors / Exceptions: None
-        // Reactive Flow: Simple Mono pipeline
-        // Side Effects: Database delete
-        // Security Notes: Ensure caller has admin rights or self-deletion
         return personRepository.deleteById(id);
     }
 }

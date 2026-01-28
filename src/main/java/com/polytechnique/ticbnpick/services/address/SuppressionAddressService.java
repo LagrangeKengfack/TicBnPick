@@ -22,23 +22,12 @@ public class SuppressionAddressService {
     /**
      * Deletes an Address by its unique identifier.
      *
-     * Removes the Address record from the repository.
+     * <p>Removes the Address record from the repository.
      *
      * @param id the UUID of the address to delete
-     * @return a Mono<Void> signaling completion
+     * @return a Mono&lt;Void&gt; signaling completion
      */
     public Mono<Void> deleteById(UUID id) {
-        // TODO:
-        // Purpose: Delete Address by ID
-        // Inputs: UUID id
-        // Outputs: Mono<Void>
-        // Steps:
-        //  1. Call addressRepository.deleteById(id)
-        // Validations: id not null
-        // Errors / Exceptions: None
-        // Reactive Flow: Simple Mono pipeline
-        // Side Effects: Database delete
-        // Security Notes: Owner or Admin
         return addressRepository.deleteById(id);
     }
 }

@@ -9,6 +9,9 @@ import java.util.UUID;
 /**
  * Event triggered when a delivery person is created.
  *
+ * <p>Published to Kafka topic "delivery-person-created" during registration.
+ * Contains the delivery person ID and email for downstream consumers.
+ *
  * @author Kengfack Lagrange
  * @date 19/12/2025
  */
@@ -18,5 +21,4 @@ import java.util.UUID;
 public class DeliveryPersonCreatedEvent {
     private UUID deliveryPersonId;
     private String email;
-    // TODO: Add any other necessary event data
 }

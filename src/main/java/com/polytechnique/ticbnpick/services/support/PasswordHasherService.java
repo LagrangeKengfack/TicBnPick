@@ -5,7 +5,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
- * Service for password hashing.
+ * Service for password hashing using BCrypt.
+ *
+ * <p>Provides secure password encoding and verification using Spring Security's
+ * BCryptPasswordEncoder with default strength (cost factor of 10).
  *
  * @author Kengfack Lagrange
  * @date 19/12/2025
@@ -18,47 +21,27 @@ public class PasswordHasherService {
     /**
      * Encodes a raw password using BCrypt.
      *
-     * Applies a secure one-way hash to the password for storage.
+     * <p>Applies a secure one-way hash to the password for storage.
+     * Each call produces a different hash due to automatic salt generation.
      *
      * @param rawPassword the plain text password
      * @return the BCrypt hashed password string
      */
     public String encode(String rawPassword) {
-        // TODO:
-        // Purpose: Hash password with BCrypt
-        // Inputs: raw password string
-        // Outputs: hashed string
-        // Steps:
-        //  1. passwordEncoder.encode(rawPassword)
-        // Validations: rawPassword not null
-        // Errors / Exceptions: None
-        // Reactive Flow: Synchronous
-        // Side Effects: None
-        // Security Notes: BCrypt strength defaults
         return passwordEncoder.encode(rawPassword);
     }
 
     /**
      * Verifies if a raw password matches the encoded password.
      *
-     * Uses BCrypt's secure comparison to check validity.
+     * <p>Uses BCrypt's secure comparison to check validity.
+     * This comparison is timing-attack safe.
      *
      * @param rawPassword the plain text password to check
      * @param encodedPassword the stored hashed password
      * @return true if passwords match, false otherwise
      */
     public boolean matches(String rawPassword, String encodedPassword) {
-        // TODO:
-        // Purpose: Verify password match
-        // Inputs: raw password, hashed password
-        // Outputs: boolean match result
-        // Steps:
-        //  1. passwordEncoder.matches(rawPassword, encodedPassword)
-        // Validations: inputs not null
-        // Errors / Exceptions: None
-        // Reactive Flow: Synchronous
-        // Side Effects: None
-        // Security Notes: Timing attack safe comparison
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
 }

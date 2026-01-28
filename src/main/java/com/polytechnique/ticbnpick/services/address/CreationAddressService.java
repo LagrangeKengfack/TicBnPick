@@ -21,24 +21,13 @@ public class CreationAddressService {
     /**
      * Persists a new Address entity to the database.
      *
-     * Validates the address object and saves it to the repository.
+     * <p>Validates the address object and saves it to the repository.
      *
      * @param address the transient Address object to persist
      * @return a Mono containing the persisted Address entity
      * @throws org.springframework.dao.DataIntegrityViolationException if data integrity is violated
      */
     public Mono<Address> createAddress(Address address) {
-        // TODO:
-        // Purpose: Create new Address
-        // Inputs: Address object
-        // Outputs: Mono<Address>
-        // Steps:
-        //  1. Call addressRepository.save(address)
-        // Validations: Mandatory fields
-        // Errors / Exceptions: DataIntegrityViolationException
-        // Reactive Flow: Simple Mono pipeline
-        // Side Effects: Database insert
-        // Security Notes: None
         return addressRepository.save(address);
     }
 }

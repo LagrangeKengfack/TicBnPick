@@ -9,6 +9,9 @@ import java.util.UUID;
 /**
  * Event triggered when a password setup is requested.
  *
+ * <p>Published when a user needs to set or reset their password.
+ * Contains the person ID and email for notification purposes.
+ *
  * @author Kengfack Lagrange
  * @date 19/12/2025
  */
@@ -18,5 +21,4 @@ import java.util.UUID;
 public class PasswordSetupRequestedEvent {
     private UUID personId;
     private String email;
-    // TODO: Add any other necessary event data
 }

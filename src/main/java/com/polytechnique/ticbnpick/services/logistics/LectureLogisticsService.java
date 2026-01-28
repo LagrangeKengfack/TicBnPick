@@ -33,17 +33,6 @@ public class LectureLogisticsService {
         return logisticsRepository.findById(id);
     }
 
-    /**
-     * Retrieves all Logistics entries associated with a specific courier.
-     *
-     * @param courierId the UUID of the courier
-     * @return a Flux containing the Logistics entries found
-     * @deprecated Use {@link #findAllByDeliveryPersonId(UUID)} instead
-     */
-    @Deprecated
-    public Flux<Logistics> findAllByCourierId(UUID courierId) {
-        return logisticsRepository.findAllByCourierId(courierId);
-    }
 
     /**
      * Retrieves a Logistics entry by delivery person ID.
