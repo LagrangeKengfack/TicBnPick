@@ -48,4 +48,7 @@ public class Packet {
     @NotNull
     @Column("is_perishable")
     private Boolean isPerishable;
+
+    @Column("thickness")
+    private Double thickness;
 }

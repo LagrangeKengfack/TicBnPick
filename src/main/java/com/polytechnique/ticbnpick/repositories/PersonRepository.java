@@ -20,5 +20,11 @@ public interface PersonRepository extends ReactiveCrudRepository<Person, UUID> {
      * @param email person email
      * @return matching person
      */
-//    Mono<Person> findByEmail(String email);
+    /**
+     * Finds a person by email.
+     *
+     * @param email person email
+     * @return matching person
+     */
+    Mono<Person> findByEmail(String email);
 }

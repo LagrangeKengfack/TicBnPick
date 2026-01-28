@@ -188,6 +188,30 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handles InvalidCredentialsException.
+     * Returns 401 Unauthorized.
+     *
+     * @param ex exchange
+     * @param exchange web exchange
+     * @return error response
+     */
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handleInvalidCredentialsException(
+            InvalidCredentialsException ex,
+            ServerWebExchange exchange) {
+
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.UNAUTHORIZED.value(),
+                "Unauthorized",
+                ex.getMessage(),
+                exchange.getRequest().getPath().value()
+        );
+
+        return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error));
+    }
+
+    /**
      * Handles all other exceptions.
      * Returns 500 Internal Server Error.
      */

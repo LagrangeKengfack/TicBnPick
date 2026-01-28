@@ -19,5 +19,5 @@ public interface ClientRepository extends ReactiveCrudRepository<Client, UUID> {
      * @param person_id person identifier
      * @return matching client
      */
-//    Mono<Client> findByPersonId(UUID person_id);
+    Mono<Client> findByPersonId(UUID person_id);
 }
