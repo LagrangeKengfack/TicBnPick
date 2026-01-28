@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -31,11 +30,11 @@ public class Person {
 
     @NotNull
     @Column("last_name")
-    private String last_name;
+    private String lastName;
 
     @NotNull
     @Column("first_name")
-    private String first_name;
+    private String firstName;
 
     @NotNull
     @Column("phone")
@@ -49,11 +48,9 @@ public class Person {
     @Column("password")
     private String password;
 
-    @NotNull
     @Column("national_id")
     private String nationalId;
 
-    @NotNull
     @Column("photo_card")
     private String photoCard;
 
@@ -65,4 +62,10 @@ public class Person {
 
     @Column("total_deliveries")
     private Integer totalDeliveries;
+
+    @Column("nui")
+    private String nui;
+
+    @Column("is_active")
+    private Boolean isActive;
 }

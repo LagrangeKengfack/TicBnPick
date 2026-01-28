@@ -1,13 +1,25 @@
 package com.polytechnique.ticbnpick.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.polytechnique.ticbnpick.dtos.requests.AdminDeliveryPersonValidationRequest;
+import com.polytechnique.ticbnpick.dtos.requests.DeliveryPersonUpdateRequest;
 import com.polytechnique.ticbnpick.dtos.responses.DeliveryPersonDetailsResponse;
+import com.polytechnique.ticbnpick.events.DeliveryPersonValidatedEvent;
+import com.polytechnique.ticbnpick.exceptions.DeliveryPersonNotFoundException;
+import com.polytechnique.ticbnpick.exceptions.ForbiddenOperationException;
+import com.polytechnique.ticbnpick.exceptions.NotFoundException;
+import com.polytechnique.ticbnpick.models.enums.deliveryPerson.DeliveryPersonStatus;
+import com.polytechnique.ticbnpick.models.enums.logistics.LogisticsType;
 import com.polytechnique.ticbnpick.services.deliveryperson.LectureDeliveryPersonService;
 import com.polytechnique.ticbnpick.services.deliveryperson.ModificationDeliveryPersonService;
+import com.polytechnique.ticbnpick.services.logistics.LectureLogisticsService;
+import com.polytechnique.ticbnpick.services.logistics.ModificationLogisticsService;
 import com.polytechnique.ticbnpick.services.person.LecturePersonService;
 import com.polytechnique.ticbnpick.services.support.EmailService;
-import com.polytechnique.ticbnpick.services.support.TokenService;
+import com.polytechnique.ticbnpick.services.support.KafkaEventPublisher;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -19,6 +31,7 @@ import java.util.UUID;
  * @author Kengfack Lagrange
  * @date 19/12/2025
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminDeliveryPersonService {
@@ -26,63 +39,62 @@ public class AdminDeliveryPersonService {
     private final LectureDeliveryPersonService lectureDeliveryPersonService;
     private final ModificationDeliveryPersonService modificationDeliveryPersonService;
     private final LecturePersonService lecturePersonService;
-    private final PendingDeliveryPersonUpdateService pendingUpdateService; // Keep this one as is or refactor if needed
-    private final TokenService tokenService;
+    private final LectureLogisticsService lectureLogisticsService;
+    private final ModificationLogisticsService modificationLogisticsService;
+    private final PendingDeliveryPersonUpdateService pendingUpdateService;
     private final EmailService emailService;
+    private final KafkaEventPublisher kafkaEventPublisher;
+    private final ObjectMapper objectMapper;
 
     /**
      * Validates or rejects a delivery person registration application.
      *
-     * Updates the status of the delivery person. If approved, triggers token generation
-     * and sends an invitation email. If rejected, sends a rejection notice.
+     * Updates the status of the delivery person. If approved, sends an approval email.
+     * If rejected, sends a rejection notice.
      *
      * @param request the validation request containing the ID and decision
      * @return a Mono<Void> signaling completion
-     * @throws com.polytechnique.ticbnpick.exceptions.DeliveryPersonNotFoundException if the ID is invalid
+     * @throws DeliveryPersonNotFoundException if the ID is invalid
+     * @throws ForbiddenOperationException if status is not PENDING
      */
     public Mono<Void> validateRegistration(AdminDeliveryPersonValidationRequest request) {
-        // TODO:
-        // Purpose: Admin approves or rejects a registration
-        // Inputs: Validation Request (ID, approved boolean, reason)
-        // Outputs: Mono<Void>
-        // Steps:
-        //  1. lectureDeliveryPersonService.findById(request.getDeliveryPersonId())
-        //  2. If approved:
-        //      a. Update status to APPROVED
-        //      b. modificationDeliveryPersonService.updateDeliveryPerson
-        //      c. emailService.send(ApprovalNotice)
-        //  3. If rejected:
-        //      a. Update status to REJECTED
-        //      b. modificationDeliveryPersonService.updateDeliveryPerson
-        //      c. emailService.send(RejectionNotice)
-        // Validations: ID exists, Current status is PENDING
-        // Errors / Exceptions: DeliveryPersonNotFoundException, ForbiddenOperationException
-        // Reactive Flow: flatMap chain
-        // Side Effects: DB update, Email sent
-        // Security Notes: Admin ONLY
         return lectureDeliveryPersonService.findById(request.getDeliveryPersonId())
-                .switchIfEmpty(Mono.error(new com.polytechnique.ticbnpick.exceptions.DeliveryPersonNotFoundException("Delivery Person not found")))
+                .switchIfEmpty(Mono.error(new DeliveryPersonNotFoundException("Delivery Person not found")))
                 .flatMap(dp -> {
-                    if (dp.getStatus() != com.polytechnique.ticbnpick.models.enums.deliveryPerson.DeliveryPersonStatus.PENDING) {
-                         // Depending on requirements, maybe allow re-validation? But spec says "Current status is PENDING"
-                         // Let's assume strict PENDING check for now.
-                         // return Mono.error(new ForbiddenOperationException("Can only validate PENDING requests"));
+                    if (dp.getStatus() != DeliveryPersonStatus.PENDING) {
+                        return Mono.error(new ForbiddenOperationException("Can only validate PENDING requests"));
                     }
                     
                     if (request.isApproved()) {
-                        dp.setStatus(com.polytechnique.ticbnpick.models.enums.deliveryPerson.DeliveryPersonStatus.APPROVED);
+                        dp.setStatus(DeliveryPersonStatus.APPROVED);
                         return modificationDeliveryPersonService.updateDeliveryPerson(dp)
-                                .flatMap(updated -> {
-                                    // emailService.sendApproval(updated.getId());
-                                    return Mono.empty();
-                                });
+                                .flatMap(updated -> lecturePersonService.findById(updated.getPersonId())
+                                        .doOnNext(person -> {
+                                            // Send approval email
+                                            emailService.sendAccountApproved(person.getEmail());
+                                            // Publish Kafka event
+                                            kafkaEventPublisher.publishDeliveryPersonValidated(
+                                                    new DeliveryPersonValidatedEvent(updated.getId(), true)
+                                            );
+                                            log.info("Delivery person {} approved", updated.getId());
+                                        })
+                                        .then()
+                                );
                     } else {
-                        dp.setStatus(com.polytechnique.ticbnpick.models.enums.deliveryPerson.DeliveryPersonStatus.REJECTED);
+                        dp.setStatus(DeliveryPersonStatus.REJECTED);
                         return modificationDeliveryPersonService.updateDeliveryPerson(dp)
-                                .flatMap(updated -> {
-                                    // emailService.sendRejection(updated.getId(), request.getReason());
-                                    return Mono.empty();
-                                });
+                                .flatMap(updated -> lecturePersonService.findById(updated.getPersonId())
+                                        .doOnNext(person -> {
+                                            // Send rejection email
+                                            emailService.sendAccountRejected(person.getEmail(), request.getReason());
+                                            // Publish Kafka event
+                                            kafkaEventPublisher.publishDeliveryPersonValidated(
+                                                    new DeliveryPersonValidatedEvent(updated.getId(), false)
+                                            );
+                                            log.info("Delivery person {} rejected", updated.getId());
+                                        })
+                                        .then()
+                                );
                     }
                 })
                 .then();
@@ -98,32 +110,40 @@ public class AdminDeliveryPersonService {
      * @param approved boolean indicating approval or rejection
      * @param reason optional reason for the decision
      * @return a Mono<Void> signaling completion
-     * @throws com.polytechnique.ticbnpick.exceptions.NotFoundException if update not found
+     * @throws NotFoundException if update not found
      */
     public Mono<Void> reviewUpdate(UUID updateId, boolean approved, String reason) {
         return pendingUpdateService.findById(updateId)
-                .switchIfEmpty(Mono.error(new com.polytechnique.ticbnpick.exceptions.NotFoundException("Pending update not found")))
+                .switchIfEmpty(Mono.error(new NotFoundException("Pending update not found")))
                 .flatMap(update -> {
                     if (approved) {
                         try {
-                            DeliveryPersonUpdateRequest request = objectMapper.readValue(update.getNewDataJson(), DeliveryPersonUpdateRequest.class);
+                            DeliveryPersonUpdateRequest request = objectMapper.readValue(
+                                    update.getNewDataJson(), DeliveryPersonUpdateRequest.class);
                             
                             return lectureDeliveryPersonService.findById(update.getDeliveryPersonId())
                                     .flatMap(dp -> {
                                         // Apply sensitive changes to DeliveryPerson
-                                        if (request.getCommercialRegister() != null) dp.setCommercialRegister(request.getCommercialRegister());
-                                        // ... other fields if stored
+                                        if (request.getCommercialRegister() != null) {
+                                            dp.setCommercialRegister(request.getCommercialRegister());
+                                        }
                                         
                                         return modificationDeliveryPersonService.updateDeliveryPerson(dp)
-                                                .flatMap(savedDp -> lectureLogisticsService.findAllByCourierId(savedDp.getId()).next()) // Assuming one logistics per courier for now or primary
-                                                .flatMap(logistics -> {
-                                                    if (request.getLogisticsType() != null) logistics.setLogisticsType(LogisticsType.fromValue(request.getLogisticsType()));
-                                                    if (request.getLogisticImage() != null) logistics.setLogisticImage(request.getLogisticImage());
-                                                    
-                                                    return modificationLogisticsService.updateLogistics(logistics);
-                                                })
+                                                .flatMap(savedDp -> 
+                                                    lectureLogisticsService.findByDeliveryPersonId(savedDp.getId())
+                                                            .flatMap(logistics -> {
+                                                                if (request.getLogisticsType() != null) {
+                                                                    logistics.setLogisticsType(
+                                                                            LogisticsType.fromValue(request.getLogisticsType()));
+                                                                }
+                                                                if (request.getLogisticImage() != null) {
+                                                                    logistics.setLogisticImage(request.getLogisticImage());
+                                                                }
+                                                                return modificationLogisticsService.updateLogistics(logistics);
+                                                            })
+                                                            .then()
+                                                )
                                                 .then(pendingUpdateService.deleteById(update.getId()));
-                                                // .then(emailService.sendUpdateApproved(dp.getPersonId()));
                                     });
                         } catch (JsonProcessingException e) {
                             return Mono.error(new RuntimeException("Error parsing update data", e));
@@ -131,7 +151,6 @@ public class AdminDeliveryPersonService {
                     } else {
                         update.setStatus("REJECTED");
                         return pendingUpdateService.save(update).then();
-                        // return emailService.sendUpdateRejected(...)
                     }
                 });
     }
@@ -144,24 +163,23 @@ public class AdminDeliveryPersonService {
      *
      * @param id the UUID of the delivery person
      * @return a Mono containing the detailed response DTO
-     * @throws com.polytechnique.ticbnpick.exceptions.DeliveryPersonNotFoundException if not found
+     * @throws DeliveryPersonNotFoundException if not found
      */
     public Mono<DeliveryPersonDetailsResponse> getDeliveryPersonDetails(UUID id) {
-        // TODO:
-        // Purpose: Get full aggregated details for Admin view
-        // Inputs: DeliveryPerson UUID
-        // Outputs: Detailed Response DTO
-        // Steps:
-        //  1. lectureDeliveryPersonService.findById(id)
-        //  2. lecturePersonService.findById(deliveryPerson.getPersonId())
-        //  3. lectureLogisticsService.findAllByCourierId(id) (Inject service first)
-        //  4. lectureAddressService... (Inject service first)
-        //  5. Aggregate into DTO
-        // Validations: ID exists
-        // Errors / Exceptions: NotFound
-        // Reactive Flow: zip results
-        // Side Effects: None
-        // Security Notes: Admin ONLY
-        return Mono.empty();
+        return lectureDeliveryPersonService.findById(id)
+                .switchIfEmpty(Mono.error(new DeliveryPersonNotFoundException("Delivery Person not found")))
+                .flatMap(dp -> lecturePersonService.findById(dp.getPersonId())
+                        .map(person -> {
+                            DeliveryPersonDetailsResponse response = new DeliveryPersonDetailsResponse();
+                            response.setId(dp.getId());
+                            response.setFirstName(person.getFirstName());
+                            response.setLastName(person.getLastName());
+                            response.setEmail(person.getEmail());
+                            response.setPhone(person.getPhone());
+                            response.setStatus(dp.getStatus() != null ? dp.getStatus().getValue() : null);
+                            response.setCommercialName(dp.getCommercialName());
+                            return response;
+                        })
+                );
     }
 }

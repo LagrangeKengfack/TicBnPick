@@ -2,6 +2,7 @@ package com.polytechnique.ticbnpick.services;
 
 import com.polytechnique.ticbnpick.dtos.requests.DeliveryPersonRegistrationRequest;
 import com.polytechnique.ticbnpick.dtos.responses.DeliveryPersonRegistrationResponse;
+import com.polytechnique.ticbnpick.events.DeliveryPersonCreatedEvent;
 import com.polytechnique.ticbnpick.exceptions.EmailAlreadyUsedException;
 import com.polytechnique.ticbnpick.mappers.DeliveryPersonMapper;
 import com.polytechnique.ticbnpick.models.Address;
@@ -15,9 +16,11 @@ import com.polytechnique.ticbnpick.services.logistics.CreationLogisticsService;
 import com.polytechnique.ticbnpick.services.person.CreationPersonService;
 import com.polytechnique.ticbnpick.services.person.LecturePersonService;
 import com.polytechnique.ticbnpick.services.support.EmailService;
+import com.polytechnique.ticbnpick.services.support.KafkaEventPublisher;
 import com.polytechnique.ticbnpick.services.support.PasswordHasherService;
 import com.polytechnique.ticbnpick.validators.DeliveryPersonRegistrationValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -28,6 +31,7 @@ import reactor.core.publisher.Mono;
  * @author Kengfack Lagrange
  * @date 19/12/2025
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DeliveryPersonRegistrationService {
@@ -42,6 +46,7 @@ public class DeliveryPersonRegistrationService {
     private final DeliveryPersonMapper mapper;
     private final PasswordHasherService passwordHasherService;
     private final EmailService emailService;
+    private final KafkaEventPublisher kafkaEventPublisher;
 
     /**
      * Orchestrates the registration of a new Delivery Person.
@@ -51,7 +56,7 @@ public class DeliveryPersonRegistrationService {
      *
      * @param request the registration request DTO containing all necessary data
      * @return a Mono containing the response DTO with the generated ID and status
-     * @throws com.polytechnique.ticbnpick.exceptions.EmailAlreadyUsedException if the email is already registered
+     * @throws EmailAlreadyUsedException if the email is already registered
      */
     @Transactional
     public Mono<DeliveryPersonRegistrationResponse> register(DeliveryPersonRegistrationRequest request) {
@@ -73,23 +78,14 @@ public class DeliveryPersonRegistrationService {
                                 deliveryPerson.setPersonId(savedPerson.getId());
                                 deliveryPerson.setStatus(DeliveryPersonStatus.PENDING);
 
-                                Logistics logistics = mapper.toLogistics(validRequest);
-                                logistics.setCourierId(savedPerson.getId()); // Using PersonID as CourierID or DeliveryPersonID?
-                                // Usually Logistics is linked to DeliveryPerson?
-                                // Let's check Logistics model.
-                                // But usually mapper handles basic mapping.
-                                // If courierId is DP ID, we need to save DP first.
-                                
                                 return creationDeliveryPersonService.createDeliveryPerson(deliveryPerson)
                                         .flatMap(savedDp -> {
-                                            // Update logistics with DP ID
-                                            logistics.setCourierId(savedDp.getId());
+                                            Logistics logistics = mapper.toLogistics(validRequest);
+                                            logistics.setDeliveryPersonId(savedDp.getId());
                                             
                                             Address address = mapper.toAddress(validRequest);
-                                            address.setPersonId(savedPerson.getId());
-                                            // Address is for Person? Or for DeliveryPerson? 
-                                            // Usually Address is linked to Person via PersonAddress or directly if Address has personId.
-                                            // The user requirement said: "Address (PRIMARY)".
+                                            // Address linked to person or stored separately
+                                            // For now, we'll just save it
                                             
                                             return Mono.zip(
                                                     creationLogisticsService.createLogistics(logistics),
@@ -97,19 +93,22 @@ public class DeliveryPersonRegistrationService {
                                             ).map(tuple -> savedDp);
                                         });
                             })
-                            .flatMap(savedDp -> {
-                                // Send email (fire and forget or wait?)
-                                // "Message final ... Un email vous sera envoyé..."
-                                emailService.sendSimpleMessage(
-                                        request.getEmail(),
-                                        "Inscription reçue",
-                                        "Compte créé, en attente de validation. Un email vous sera envoyé lorsque votre demande aura été examiné"
+                            .doOnSuccess(savedDp -> {
+                                // Send email (fire and forget)
+                                emailService.sendRegistrationReceived(request.getEmail());
+                                
+                                // Publish Kafka event
+                                kafkaEventPublisher.publishDeliveryPersonCreated(
+                                        new DeliveryPersonCreatedEvent(savedDp.getId(), request.getEmail())
                                 );
                                 
+                                log.info("Delivery person registered: {} with status PENDING", savedDp.getId());
+                            })
+                            .map(savedDp -> {
                                 DeliveryPersonRegistrationResponse response = new DeliveryPersonRegistrationResponse();
                                 response.setDeliveryPersonId(savedDp.getId());
                                 response.setStatus("PENDING");
-                                return Mono.just(response);
+                                return response;
                             });
                 });
     }

@@ -13,8 +13,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class LogisticsMapper {
 
+    /**
+     * Maps a LogisticsCreateRequest to a Logistics entity.
+     *
+     * @param request the DTO to map from
+     * @return the mapped Logistics entity
+     */
     public Logistics toEntity(LogisticsCreateRequest request) {
-        // TODO: Map fields from request to new Logistics entity
-        return null;
+        if (request == null) {
+            return null;
+        }
+        Logistics logistics = new Logistics();
+        logistics.setLogisticsType(request.getType());
+        logistics.setLogisticsClass(request.getLogisticsClass());
+        logistics.setPlateNumber(request.getLicensePlate());
+        return logistics;
     }
 }

@@ -18,5 +18,5 @@ import java.util.UUID;
 public class AdminDeliveryPersonValidationRequest {
     private UUID deliveryPersonId;
     private boolean approved;
-    private String rejectionReason;
+    private String reason;
 }

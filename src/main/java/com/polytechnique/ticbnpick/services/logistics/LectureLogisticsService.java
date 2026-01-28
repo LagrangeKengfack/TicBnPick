@@ -30,40 +30,38 @@ public class LectureLogisticsService {
      * @return a Mono containing the Logistics if found, or empty if not
      */
     public Mono<Logistics> findById(UUID id) {
-        // TODO:
-        // Purpose: Retrieve Logistics by ID
-        // Inputs: UUID id
-        // Outputs: Mono<Logistics>
-        // Steps:
-        //  1. Call logisticsRepository.findById(id)
-        // Validations: id not null
-        // Errors / Exceptions: Mono.empty() if not found
-        // Reactive Flow: Simple Mono pipeline
-        // Side Effects: None
-        // Security Notes: None
         return logisticsRepository.findById(id);
     }
 
     /**
      * Retrieves all Logistics entries associated with a specific courier.
      *
-     * Queries the repository for all logistics entries linked to the courier's ID.
-     *
      * @param courierId the UUID of the courier
      * @return a Flux containing the Logistics entries found
+     * @deprecated Use {@link #findAllByDeliveryPersonId(UUID)} instead
      */
+    @Deprecated
     public Flux<Logistics> findAllByCourierId(UUID courierId) {
-        // TODO:
-        // Purpose: Retrieve all Logistics for a courier
-        // Inputs: UUID courierId
-        // Outputs: Flux<Logistics>
-        // Steps:
-        //  1. Call logisticsRepository.findAllByCourierId(courierId)
-        // Validations: courierId not null
-        // Errors / Exceptions: Empty Flux if none
-        // Reactive Flow: Simple Flux pipeline
-        // Side Effects: None
-        // Security Notes: None
         return logisticsRepository.findAllByCourierId(courierId);
+    }
+
+    /**
+     * Retrieves a Logistics entry by delivery person ID.
+     *
+     * @param deliveryPersonId the UUID of the delivery person
+     * @return a Mono containing the Logistics if found, or empty if not
+     */
+    public Mono<Logistics> findByDeliveryPersonId(UUID deliveryPersonId) {
+        return logisticsRepository.findByDeliveryPersonId(deliveryPersonId);
+    }
+
+    /**
+     * Retrieves all Logistics entries for a delivery person.
+     *
+     * @param deliveryPersonId the UUID of the delivery person
+     * @return a Flux containing all Logistics entries
+     */
+    public Flux<Logistics> findAllByDeliveryPersonId(UUID deliveryPersonId) {
+        return logisticsRepository.findAllByDeliveryPersonId(deliveryPersonId);
     }
 }

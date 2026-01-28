@@ -1,7 +1,7 @@
 CREATE TABLE delivery_persons (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     person_id UUID NOT NULL,
-    commercial_register UUID NOT NULL,
+    commercial_register VARCHAR NOT NULL,
     commercial_name VARCHAR NOT NULL,
     taxpayer_number VARCHAR NOT NULL,
     status VARCHAR NOT NULL,
