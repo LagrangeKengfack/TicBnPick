@@ -23,46 +23,24 @@ public class LectureDeliveryPersonService {
     /**
      * Retrieves a DeliveryPerson by their unique identifier.
      *
-     * Queries the repository for a DeliveryPerson with the specified ID.
+     * <p>Queries the repository for a DeliveryPerson with the specified ID.
      *
      * @param id the UUID of the delivery person to retrieve
      * @return a Mono containing the DeliveryPerson if found, or empty if not
      */
     public Mono<DeliveryPerson> findById(UUID id) {
-        // TODO:
-        // Purpose: Retrieve DeliveryPerson by ID
-        // Inputs: UUID id
-        // Outputs: Mono<DeliveryPerson>
-        // Steps:
-        //  1. Call deliveryPersonRepository.findById(id)
-        // Validations: id not null
-        // Errors / Exceptions: Mono.empty() if not found
-        // Reactive Flow: Simple Mono pipeline
-        // Side Effects: None
-        // Security Notes: None
         return deliveryPersonRepository.findById(id);
     }
 
     /**
      * Retrieves a DeliveryPerson by their associated Person ID.
      *
-     * Queries the repository for a DeliveryPerson linked to the specified Person ID.
+     * <p>Queries the repository for a DeliveryPerson linked to the specified Person ID.
      *
      * @param personId the UUID of the associated Person
      * @return a Mono containing the DeliveryPerson if found, or empty if not
      */
     public Mono<DeliveryPerson> findByPersonId(UUID personId) {
-        // TODO:
-        // Purpose: Retrieve DeliveryPerson by Person ID
-        // Inputs: UUID personId
-        // Outputs: Mono<DeliveryPerson>
-        // Steps:
-        //  1. Call deliveryPersonRepository.findByPersonId(personId)
-        // Validations: personId not null
-        // Errors / Exceptions: Mono.empty() if not found
-        // Reactive Flow: Simple Mono pipeline
-        // Side Effects: None
-        // Security Notes: None
         return deliveryPersonRepository.findByPersonId(personId);
     }
 }

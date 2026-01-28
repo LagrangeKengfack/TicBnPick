@@ -21,25 +21,13 @@ public class ModificationPersonService {
     /**
      * Updates an existing Person entity in the database.
      *
-     * Saves the provided Person object, updating the existing record based on ID.
+     * <p>Saves the provided Person object, updating the existing record based on ID.
      *
      * @param person the Person object with updated fields
      * @return a Mono containing the updated Person entity
      * @throws org.springframework.dao.OptimisticLockingFailureException if version mismatch occurs
      */
     public Mono<Person> updatePerson(Person person) {
-        // TODO:
-        // Purpose: Update an existing Person entity
-        // Inputs: Person object (managed, with ID)
-        // Outputs: Mono<Person> (updated)
-        // Steps:
-        //  1. Validate ID exists in Person object
-        //  2. Call personRepository.save(person) (r2dbc save acts as update if ID present)
-        // Validations: ID not null
-        // Errors / Exceptions: OptimisticLockingFailureException if version mismatch (if configured)
-        // Reactive Flow: Simple Mono pipeline
-        // Side Effects: Database update
-        // Security Notes: Ensure caller is authorized
         return personRepository.save(person);
     }
 }

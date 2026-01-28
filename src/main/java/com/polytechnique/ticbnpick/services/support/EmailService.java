@@ -10,7 +10,13 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 /**
- * Service for sending emails.
+ * Service for sending transactional emails via Gmail SMTP.
+ *
+ * <p>Provides methods for sending various notification emails related to
+ * delivery person account lifecycle events. Uses Spring's JavaMailSender
+ * configured with Gmail SMTP settings.
+ *
+ * <p>All email methods are fire-and-forget and log errors without throwing.
  *
  * @author Kengfack Lagrange
  * @date 19/12/2025
@@ -23,10 +29,10 @@ public class EmailService {
     private final JavaMailSender emailSender;
 
     /**
-     * Sends a simple email message.
+     * Sends a simple email message synchronously.
      *
-     * This method sends a synchronous email using the configured JavaMailSender,
-     * wrapped in a reactive Mono for non-blocking execution.
+     * <p>Constructs and sends an email using the configured JavaMailSender.
+     * Errors are logged but not propagated to avoid breaking the main flow.
      *
      * @param to the recipient's email address
      * @param subject the subject of the email
@@ -49,13 +55,13 @@ public class EmailService {
     /**
      * Sends a simple email message reactively.
      *
-     * Wraps the blocking email send operation in a Mono that executes
+     * <p>Wraps the blocking email send operation in a Mono that executes
      * on the bounded elastic scheduler to avoid blocking the event loop.
      *
      * @param to the recipient's email address
      * @param subject the subject of the email
      * @param text the body text of the email
-     * @return a Mono<Void> signaling completion
+     * @return a Mono&lt;Void&gt; signaling completion
      */
     public Mono<Void> sendSimpleMessageReactive(String to, String subject, String text) {
         return Mono.fromRunnable(() -> sendSimpleMessage(to, subject, text))
@@ -65,6 +71,9 @@ public class EmailService {
 
     /**
      * Sends a registration received notification email.
+     *
+     * <p>Informs the delivery person that their registration request
+     * has been received and is pending admin validation.
      *
      * @param to the recipient's email address
      */
@@ -84,6 +93,9 @@ public class EmailService {
     /**
      * Sends an account approved notification email.
      *
+     * <p>Informs the delivery person that their account has been approved
+     * and they can now access the platform.
+     *
      * @param to the recipient's email address
      */
     public void sendAccountApproved(String to) {
@@ -101,8 +113,11 @@ public class EmailService {
     /**
      * Sends an account rejected notification email.
      *
+     * <p>Informs the delivery person that their registration has been rejected,
+     * with an optional reason for the decision.
+     *
      * @param to the recipient's email address
-     * @param reason optional reason for rejection
+     * @param reason optional reason for rejection (may be null or empty)
      */
     public void sendAccountRejected(String to, String reason) {
         String reasonText = (reason != null && !reason.isEmpty()) 
@@ -116,6 +131,49 @@ public class EmailService {
                 "en tant que livreur n'a pas été approuvée.\n" +
                 reasonText +
                 "\nSi vous pensez qu'il s'agit d'une erreur, veuillez nous contacter.\n\n" +
+                "Cordialement,\n" +
+                "L'équipe TicBnPick"
+        );
+    }
+
+    /**
+     * Sends an account suspended notification email.
+     *
+     * <p>Informs the delivery person that their account has been temporarily suspended.
+     * Provides contact information for inquiries.
+     *
+     * @param to the recipient's email address
+     */
+    public void sendAccountSuspended(String to) {
+        sendSimpleMessage(
+                to,
+                "TicBnPick - Compte suspendu",
+                "Bonjour,\n\n" +
+                "Nous vous informons que votre compte livreur a été temporairement suspendu.\n\n" +
+                "Durant cette période, vous ne pourrez pas accéder aux fonctionnalités de l'application.\n\n" +
+                "Si vous pensez qu'il s'agit d'une erreur ou pour plus d'informations, " +
+                "veuillez contacter notre équipe support.\n\n" +
+                "Cordialement,\n" +
+                "L'équipe TicBnPick"
+        );
+    }
+
+    /**
+     * Sends an account revoked notification email.
+     *
+     * <p>Informs the delivery person that their account has been permanently deactivated.
+     * This is a final status with no automatic reactivation.
+     *
+     * @param to the recipient's email address
+     */
+    public void sendAccountRevoked(String to) {
+        sendSimpleMessage(
+                to,
+                "TicBnPick - Compte révoqué",
+                "Bonjour,\n\n" +
+                "Nous vous informons que votre compte livreur a été définitivement révoqué.\n\n" +
+                "Cette décision est irrévocable et vous ne pourrez plus accéder à l'application.\n\n" +
+                "Si vous pensez qu'il s'agit d'une erreur, veuillez contacter notre équipe support.\n\n" +
                 "Cordialement,\n" +
                 "L'équipe TicBnPick"
         );

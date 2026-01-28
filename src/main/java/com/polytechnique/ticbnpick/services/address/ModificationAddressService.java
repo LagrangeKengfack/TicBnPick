@@ -21,24 +21,13 @@ public class ModificationAddressService {
     /**
      * Updates an existing Address entity in the database.
      *
-     * Saves the provided Address object, updating the existing record based on ID.
+     * <p>Saves the provided Address object, updating the existing record based on ID.
      *
      * @param address the Address object with updated fields
      * @return a Mono containing the updated Address entity
      * @throws org.springframework.dao.OptimisticLockingFailureException if version mismatch occurs
      */
     public Mono<Address> updateAddress(Address address) {
-        // TODO:
-        // Purpose: Update Address
-        // Inputs: Address object
-        // Outputs: Mono<Address>
-        // Steps:
-        //  1. Call addressRepository.save(address)
-        // Validations: ID present
-        // Errors / Exceptions: OptimisticLockingFailureException
-        // Reactive Flow: Simple Mono pipeline
-        // Side Effects: Database update
-        // Security Notes: Owner or Admin
         return addressRepository.save(address);
     }
 }

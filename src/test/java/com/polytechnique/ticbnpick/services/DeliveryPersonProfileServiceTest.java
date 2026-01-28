@@ -1,10 +1,8 @@
 package com.polytechnique.ticbnpick.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.polytechnique.ticbnpick.dtos.requests.DeliveryPersonUpdateRequest;
 import com.polytechnique.ticbnpick.models.DeliveryPerson;
 import com.polytechnique.ticbnpick.models.Logistics;
-import com.polytechnique.ticbnpick.models.PendingDeliveryPersonUpdate;
 import com.polytechnique.ticbnpick.models.Person;
 import com.polytechnique.ticbnpick.services.deliveryperson.LectureDeliveryPersonService;
 import com.polytechnique.ticbnpick.services.deliveryperson.ModificationDeliveryPersonService;
@@ -23,9 +21,14 @@ import reactor.test.StepVerifier;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for DeliveryPersonProfileService.
+ *
+ * <p>Tests verify that profile updates are applied directly
+ * without any pending approval workflow.
+ */
 @ExtendWith(MockitoExtension.class)
 class DeliveryPersonProfileServiceTest {
 
@@ -35,50 +38,50 @@ class DeliveryPersonProfileServiceTest {
     @Mock private ModificationLogisticsService modificationLogisticsService;
     @Mock private LecturePersonService lecturePersonService;
     @Mock private ModificationPersonService modificationPersonService;
-    @Mock private PendingDeliveryPersonUpdateService pendingUpdateService;
-    @Mock private ObjectMapper objectMapper;
 
     @InjectMocks
     private DeliveryPersonProfileService service;
 
     @Test
-    void updateProfile_SensitiveFields_ShouldCreatePendingUpdate() throws Exception {
+    void updateProfile_AllFields_ShouldUpdateDirectly() {
         // Arrange
         UUID dpId = UUID.randomUUID();
         DeliveryPersonUpdateRequest request = new DeliveryPersonUpdateRequest();
-        request.setCommercialRegister("NEW_REG"); // Sensitive
-        request.setPhone("123456"); // Non-sensitive
+        request.setCommercialRegister("NEW_REG");
+        request.setPhone("123456");
+        request.setCommercialName("New Name");
+        request.setPlateNumber("XYZ123");
 
         DeliveryPerson dp = new DeliveryPerson();
         dp.setId(dpId);
         dp.setPersonId(UUID.randomUUID());
 
         Person person = new Person();
+        Logistics logistics = new Logistics();
 
         when(lectureDeliveryPersonService.findById(dpId)).thenReturn(Mono.just(dp));
         when(lecturePersonService.findById(dp.getPersonId())).thenReturn(Mono.just(person));
         when(modificationPersonService.updatePerson(any())).thenReturn(Mono.just(person));
-        
-        // Mock non-sensitive update calls (deferred in service, so might be skipped if no changes? Phone changed.)
-        
-        // Mock sensitive update
-        when(objectMapper.writeValueAsString(request)).thenReturn("{}");
-        when(pendingUpdateService.save(any())).thenReturn(Mono.just(new PendingDeliveryPersonUpdate()));
+        when(modificationDeliveryPersonService.updateDeliveryPerson(any())).thenReturn(Mono.just(dp));
+        when(lectureLogisticsService.findByDeliveryPersonId(dpId)).thenReturn(Mono.just(logistics));
+        when(modificationLogisticsService.updateLogistics(any())).thenReturn(Mono.just(logistics));
 
         // Act & Assert
         StepVerifier.create(service.updateProfile(dpId, request))
                 .verifyComplete();
 
-        verify(pendingUpdateService).save(any(PendingDeliveryPersonUpdate.class));
-        verify(modificationPersonService).updatePerson(any()); // Phone should be updated
+        // Verify direct updates (no pending workflow)
+        verify(modificationPersonService).updatePerson(any());
+        verify(modificationDeliveryPersonService).updateDeliveryPerson(any());
+        verify(modificationLogisticsService).updateLogistics(any());
     }
 
     @Test
-    void updateProfile_NoSensitiveFields_ShouldUpdateDirectly() {
+    void updateProfile_OnlyPersonFields_ShouldUpdatePerson() {
         // Arrange
         UUID dpId = UUID.randomUUID();
         DeliveryPersonUpdateRequest request = new DeliveryPersonUpdateRequest();
-        request.setPhone("123456"); // Non-sensitive only
+        request.setPhone("123456");
 
         DeliveryPerson dp = new DeliveryPerson();
         dp.setId(dpId);
@@ -89,15 +92,41 @@ class DeliveryPersonProfileServiceTest {
         when(lectureDeliveryPersonService.findById(dpId)).thenReturn(Mono.just(dp));
         when(lecturePersonService.findById(dp.getPersonId())).thenReturn(Mono.just(person));
         when(modificationPersonService.updatePerson(any())).thenReturn(Mono.just(person));
-        
-        // We also need to mock Logistics service because updateNonSensitiveFields calls it
-        when(lectureLogisticsService.findByDeliveryPersonId(dpId)).thenReturn(Mono.empty()); // Or Mono.just(logistics) if we want to test logistics update
+        when(lectureLogisticsService.findByDeliveryPersonId(dpId)).thenReturn(Mono.empty());
 
         // Act & Assert
         StepVerifier.create(service.updateProfile(dpId, request))
                 .verifyComplete();
 
-        verify(pendingUpdateService, never()).save(any());
         verify(modificationPersonService).updatePerson(any());
+        verify(modificationDeliveryPersonService, never()).updateDeliveryPerson(any());
+        verify(modificationLogisticsService, never()).updateLogistics(any());
+    }
+
+    @Test
+    void updateProfile_OnlyDeliveryPersonFields_ShouldUpdateDeliveryPerson() {
+        // Arrange
+        UUID dpId = UUID.randomUUID();
+        DeliveryPersonUpdateRequest request = new DeliveryPersonUpdateRequest();
+        request.setCommercialName("Updated Name");
+        request.setCommercialRegister("UPDATED_REG");
+
+        DeliveryPerson dp = new DeliveryPerson();
+        dp.setId(dpId);
+        dp.setPersonId(UUID.randomUUID());
+
+        Person person = new Person();
+
+        when(lectureDeliveryPersonService.findById(dpId)).thenReturn(Mono.just(dp));
+        when(lecturePersonService.findById(dp.getPersonId())).thenReturn(Mono.just(person));
+        when(modificationDeliveryPersonService.updateDeliveryPerson(any())).thenReturn(Mono.just(dp));
+        when(lectureLogisticsService.findByDeliveryPersonId(dpId)).thenReturn(Mono.empty());
+
+        // Act & Assert
+        StepVerifier.create(service.updateProfile(dpId, request))
+                .verifyComplete();
+
+        verify(modificationDeliveryPersonService).updateDeliveryPerson(any());
+        verify(modificationPersonService, never()).updatePerson(any());
     }
 }
