@@ -16,7 +16,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeliveryPersonRegistrationResponse {
-    private UUID id;
-    private String email;
+    private UUID deliveryPersonId;
     private String status;
 }

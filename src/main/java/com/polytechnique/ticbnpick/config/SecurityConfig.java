@@ -31,6 +31,8 @@ public class SecurityConfig {
                                                 .pathMatchers("/api/auth/**").permitAll()
                                                 .pathMatchers(HttpMethod.POST, "/api/clients").permitAll() // Allow
                                                                                                            // registration
+                                                .pathMatchers("/actuator/**").permitAll()
+                                                .pathMatchers("/api/admin/**").authenticated()
                                                 .anyExchange().authenticated())
                                 .build();
         }

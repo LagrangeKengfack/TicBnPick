@@ -4,6 +4,7 @@ CREATE TABLE logistics (
     plate_number VARCHAR NOT NULL,
     logistics_type VARCHAR NOT NULL,
     logistics_class VARCHAR NOT NULL,
+    logistic_image VARCHAR NOT NULL,
     rating DOUBLE PRECISION,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,

@@ -13,8 +13,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class AddressMapper {
 
+    /**
+     * Maps an AddressCreateRequest to an Address entity.
+     *
+     * @param request the DTO to map from
+     * @return the mapped Address entity
+     */
     public Address toEntity(AddressCreateRequest request) {
-        // TODO: Map fields from request to new Address entity
-        return null;
+        if (request == null) {
+            return null;
+        }
+        Address address = new Address();
+        address.setStreet(request.getStreet());
+        address.setCity(request.getCity());
+        address.setCountry(request.getCountry());
+        address.setType(request.getType());
+        return address;
     }
 }
