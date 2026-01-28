@@ -36,7 +36,9 @@ public class AnnouncementService {
         packet.setFragile(request.getPacket().getFragile());
         packet.setDescription(request.getPacket().getDescription());
         packet.setPhotoPacket(request.getPacket().getPhotoPacket());
+        packet.setPhotoPacket(request.getPacket().getPhotoPacket());
         packet.setIsPerishable(request.getPacket().getIsPerishable());
+        packet.setThickness(request.getPacket().getThickness());
 
         return packetRepository.save(packet).flatMap(savedPacket -> {
             // 2. Save Pickup Address
@@ -53,7 +55,8 @@ public class AnnouncementService {
                     announcement.setDeliveryAddressId(savedDelivery.getId());
                     announcement.setTitle(request.getTitle());
                     announcement.setDescription(request.getDescription());
-                    announcement.setPrice(request.getPrice());
+                    announcement.setDescription(request.getDescription());
+                    // announcement.setPrice(request.getPrice()); // Removed
                     announcement.setStatus(AnnouncementStatus.PUBLISHED); // Default status
                     announcement.setCreatedAt(Instant.now());
                     announcement.setRecipientName(request.getRecipientName());
@@ -107,7 +110,8 @@ public class AnnouncementService {
         response.setTitle(announcement.getTitle());
         response.setDescription(announcement.getDescription());
         response.setStatus(announcement.getStatus());
-        response.setPrice(announcement.getPrice());
+        response.setStatus(announcement.getStatus());
+        // response.setPrice(announcement.getPrice()); // Removed
         response.setCreatedAt(announcement.getCreatedAt());
         response.setUpdatedAt(announcement.getUpdatedAt());
         response.setRecipientName(announcement.getRecipientName());
@@ -141,7 +145,9 @@ public class AnnouncementService {
         dto.setFragile(packet.getFragile());
         dto.setDescription(packet.getDescription());
         dto.setPhotoPacket(packet.getPhotoPacket());
+        dto.setPhotoPacket(packet.getPhotoPacket());
         dto.setIsPerishable(packet.getIsPerishable());
+        dto.setThickness(packet.getThickness());
         return dto;
     }
     @Transactional("connectionFactoryTransactionManager")
@@ -150,7 +156,9 @@ public class AnnouncementService {
                 .flatMap(announcement -> {
                     announcement.setTitle(request.getTitle());
                     announcement.setDescription(request.getDescription());
-                    announcement.setPrice(request.getPrice());
+                    announcement.setTitle(request.getTitle());
+                    announcement.setDescription(request.getDescription());
+                    // announcement.setPrice(request.getPrice()); // Removed
                     announcement.setRecipientName(request.getRecipientName());
                     announcement.setRecipientNumber(request.getRecipientNumber());
                     announcement.setAmount(request.getAmount());
@@ -167,7 +175,9 @@ public class AnnouncementService {
                                             packet.setFragile(request.getPacket().getFragile());
                                             packet.setDescription(request.getPacket().getDescription());
                                             packet.setPhotoPacket(request.getPacket().getPhotoPacket());
+                                            packet.setPhotoPacket(request.getPacket().getPhotoPacket());
                                             packet.setIsPerishable(request.getPacket().getIsPerishable());
+                                            packet.setThickness(request.getPacket().getThickness());
                                             return packetRepository.save(packet);
                                         }
                                         return Mono.just(packet);

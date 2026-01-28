@@ -10,7 +10,7 @@ public class AnnouncementRequestDTO {
     private UUID clientId;
     private String title;
     private String description;
-    private Double price;
+
     private String recipientName;
     private String recipientNumber;
     private Float amount;

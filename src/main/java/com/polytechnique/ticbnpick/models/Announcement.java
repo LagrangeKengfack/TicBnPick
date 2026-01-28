@@ -54,8 +54,7 @@ public class Announcement {
     @Column("status")
     private AnnouncementStatus status;
 
-    @Column("price")
-    private Double price;
+
 
     @Column("created_at")
     private Instant createdAt;

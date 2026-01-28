@@ -14,7 +14,7 @@ public class AnnouncementResponseDTO {
     private String title;
     private String description;
     private AnnouncementStatus status;
-    private Double price;
+
     private Instant createdAt;
     private Instant updatedAt;
     private String recipientName;

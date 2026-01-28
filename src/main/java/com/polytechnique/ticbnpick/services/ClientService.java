@@ -8,6 +8,7 @@ import com.polytechnique.ticbnpick.models.Person;
 import com.polytechnique.ticbnpick.repositories.ClientRepository;
 import com.polytechnique.ticbnpick.repositories.PersonRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -27,6 +28,7 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
     private final PersonRepository personRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * Creates a new client with associated person.
@@ -42,7 +44,7 @@ public class ClientService {
         person.setFirst_name(clientDTO.getFirstName());
         person.setPhone(clientDTO.getPhone());
         person.setEmail(clientDTO.getEmail());
-        person.setPassword(clientDTO.getPassword());
+        person.setPassword(passwordEncoder.encode(clientDTO.getPassword()));
         person.setNationalId(clientDTO.getNationalId());
         person.setPhotoCard(clientDTO.getPhotoCard());
         person.setCriminalRecord(clientDTO.getCriminalRecord());
