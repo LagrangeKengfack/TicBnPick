@@ -34,7 +34,7 @@ public class DeliveryPerson {
 
     @NotNull
     @Column("commercial_register")
-    private UUID commercialRegister;
+    private String commercialRegister;
 
     @NotNull
     @Column("commercial_name")
