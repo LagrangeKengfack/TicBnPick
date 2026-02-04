@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { useRouter } from 'next/navigation'
 import {
@@ -22,7 +24,10 @@ import {
   MessageSquare,
   User,
   Calendar,
-  MapPin as MapPinIcon
+  MapPin as MapPinIcon,
+  DollarSign,
+  MapIcon,
+  Plus
 } from 'lucide-react'
 
 export default function ClientLanding() {
@@ -30,6 +35,72 @@ export default function ClientLanding() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [trackingNumber, setTrackingNumber] = useState('')
   const [activeTab, setActiveTab] = useState('accueil')
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState<any>(null)
+  const [detailsOpen, setDetailsOpen] = useState(false)
+  const [myAnnouncements, setMyAnnouncements] = useState([
+    {
+      id: 'TBP-CLIENT-001',
+      pickupAddress: 'Quartier Bastos, Yaoundé',
+      deliveryAddress: 'Douala, Centre-ville',
+      distance: 25.5,
+      estimatedTime: '45 min',
+      price: 5000,
+      packageType: 'Courses urgentes',
+      designation: 'Vêtements',
+      weight: 3,
+      volume: 0.5,
+      options: ['Livraison'],
+      deliveryType: 'Express 48h',
+      urgency: 'high',
+      published: true
+    },
+    {
+      id: 'TBP-CLIENT-002',
+      pickupAddress: 'Plateau, Stade Général De Gaulle',
+      deliveryAddress: 'Cocody, Angre',
+      distance: 6.8,
+      estimatedTime: '20 min',
+      price: 1800,
+      packageType: 'Documents',
+      designation: 'Papiers importants',
+      weight: 0.5,
+      volume: 0.01,
+      options: ['Assurance'],
+      deliveryType: 'Standard 72h',
+      urgency: 'normal',
+      published: false
+    },
+    {
+      id: 'TBP-CLIENT-TEST-001',
+      pickupAddress: 'Yopougon, Marché Central',
+      deliveryAddress: 'Attécoubé, Route de Bassam',
+      distance: 9.5,
+      estimatedTime: '30 min',
+      price: 3000,
+      packageType: 'Colis général',
+      designation: 'Test Annonce',
+      weight: 5,
+      volume: 0.5,
+      options: ['Livraison'],
+      deliveryType: 'Express 48h',
+      urgency: 'normal',
+      published: true
+    }
+  ])
+
+  // Fonction pour publier une annonce
+  const handlePublishAnnouncement = (id: string) => {
+    setMyAnnouncements((prev) =>
+      prev.map((ann) =>
+        ann.id === id ? { ...ann, published: true } : ann
+      )
+    )
+  }
+
+  // Fonction pour supprimer une annonce
+  const handleDeleteAnnouncement = (id: string) => {
+    setMyAnnouncements((prev) => prev.filter((ann) => ann.id !== id))
+  }
 
   // Données fictives du client
   const clientInfo = {
@@ -139,7 +210,176 @@ export default function ClientLanding() {
 
       {/* Main Content */}
       <main className="flex-1">
-        {/* Hero Section */}
+        {/* Announcements Section */}
+        {activeTab === 'annonces' && (
+          <section className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8 bg-white">
+            <div className="max-w-7xl mx-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">Mes Annonces</h2>
+                <Button 
+                  className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-semibold"
+                  onClick={() => router.push('/expedition')}
+                >
+                  <Plus className="w-5 h-5 mr-2" />
+                  Ajouter une annonce
+                </Button>
+              </div>
+              <div className="grid lg:grid-cols-2 gap-4">
+                {myAnnouncements.map((announcement) => (
+                  <Card key={announcement.id} className="border-2 border-orange-500 bg-orange-50 hover:shadow-lg transition-shadow">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-1">
+                          <CardTitle className="text-base">{announcement.id}</CardTitle>
+                        </div>
+                        <Badge variant={announcement.published ? "default" : "secondary"} className={announcement.published ? "bg-green-100 text-green-700 border-green-300" : "bg-red-100 text-red-700 border-red-300"}>
+                          {announcement.published ? "Publiée" : "Non publiée"}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex items-start gap-2">
+                        <MapPin className="w-4 h-4 text-gray-500 mt-0.5 flex-shrink-0" />
+                        <div className="space-y-2 flex-1">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-green-500 rounded-full" />
+                            <p className="text-sm text-gray-700">
+                              <span className="font-medium">Retrait:</span> {announcement.pickupAddress}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-red-500 rounded-full" />
+                            <p className="text-sm text-gray-700">
+                              <span className="font-medium">Livraison:</span> {announcement.deliveryAddress}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-sm text-gray-600 pt-2 border-t">
+                        <div className="flex items-center gap-2">
+                          <MapIcon className="w-4 h-4" />
+                          <span>{announcement.distance} km</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4" />
+                          <span>{announcement.estimatedTime}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <DollarSign className="w-4 h-4 text-green-600" />
+                          <span className="font-semibold text-green-600">{announcement.price.toLocaleString()} FCFA</span>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2 pt-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => { setSelectedAnnouncement(announcement); setDetailsOpen(true) }}
+                        >
+                          Voir Détails
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1 border-red-500 text-red-600 hover:bg-red-100"
+                          onClick={() => handleDeleteAnnouncement(announcement.id)}
+                        >
+                          Supprimer
+                        </Button>
+                        {!announcement.published && (
+                          <Button
+                            size="sm"
+                            className="flex-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600"
+                            onClick={() => handlePublishAnnouncement(announcement.id)}
+                          >
+                            Publier
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Details Dialog */}
+              <Dialog open={detailsOpen} onOpenChange={(o) => { setDetailsOpen(o); if (!o) setSelectedAnnouncement(null) }}>
+                <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-orange-50 rounded-md flex items-center justify-center">
+                          <Package className="w-5 h-5 text-orange-600" />
+                        </div>
+                        <div>
+                          <DialogTitle>Résumé du colis</DialogTitle>
+                          <DialogDescription className="text-sm text-gray-500">{selectedAnnouncement?.id}</DialogDescription>
+                        </div>
+                      </div>
+                    </DialogHeader>
+
+                    <div className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-3">
+                      <div className="sm:col-span-1">
+                        <div className="w-full h-32 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                          <img alt="package" src="/placeholder-package.png" className="object-cover w-full h-full" onError={(e) => { (e.target as HTMLImageElement).src = '/favicon.ico' }} />
+                        </div>
+                      </div>
+
+                      <div className="sm:col-span-2 space-y-4">
+                        <div>
+                          <p className="text-sm text-gray-500 mb-1">De</p>
+                          <p className="font-medium text-gray-900">{selectedAnnouncement?.pickupAddress}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500 mb-1">À</p>
+                          <p className="font-medium text-gray-900">{selectedAnnouncement?.deliveryAddress}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500 mb-1">Distance</p>
+                          <p className="font-medium text-gray-900">{selectedAnnouncement?.distance} km</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500 mb-1">Temps estimé</p>
+                          <p className="font-medium text-gray-900">{selectedAnnouncement?.estimatedTime}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500 mb-1">Prix</p>
+                          <p className="font-medium text-green-600 text-lg">{selectedAnnouncement?.price.toLocaleString()} FCFA</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 space-y-2 border-t pt-4">
+                      <h4 className="font-medium text-gray-900">Détails du colis</h4>
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                          <p className="text-gray-500">Type</p>
+                          <p className="font-medium text-gray-900">{selectedAnnouncement?.packageType}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500">Désignation</p>
+                          <p className="font-medium text-gray-900">{selectedAnnouncement?.designation}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500">Poids</p>
+                          <p className="font-medium text-gray-900">{selectedAnnouncement?.weight} kg</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500">Volume</p>
+                          <p className="font-medium text-gray-900">{selectedAnnouncement?.volume} m³</p>
+                        </div>
+                      </div>
+                    </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </section>
+        )}
+
+        {/* Hero and How It Works Section */}
+        {activeTab === 'accueil' && (
+        <>
+        
         <section className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-white to-amber-50 py-16 sm:py-24 lg:py-32">
           {/* Decorative Elements */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-orange-100 to-transparent opacity-50 rounded-full translate-x-1/2 -translate-y-1/2"></div>
@@ -199,7 +439,12 @@ export default function ClientLanding() {
                     <Megaphone className="w-5 h-5 mr-2" />
                     Publier une annonce
                   </Button>
-                  <Button size="lg" variant="outline" className="border-2 border-orange-300 text-orange-600 hover:bg-orange-50 font-semibold px-8 h-12 text-base">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-2 border-orange-300 text-orange-600 hover:bg-orange-50 font-semibold px-8 h-12 text-base"
+                    onClick={() => router.push('/inscription?role=livreur&step=2')}
+                  >
                     <Truck className="w-5 h-5 mr-2" />
                     Devenir livreur
                   </Button>
@@ -303,6 +548,8 @@ export default function ClientLanding() {
             </div>
           </div>
         </section>
+        </>
+        )}
       </main>
 
       {/* Bottom Navigation */}

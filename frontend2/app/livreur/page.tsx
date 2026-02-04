@@ -143,6 +143,23 @@ export default function LivreurDashboard() {
       deliveryType: 'Standard 72h',
       urgency: 'urgent',
       customerRating: 4.9
+    },
+    {
+      id: 'TBP-2024-TEST-001',
+      customerName: 'Test Client',
+      pickupAddress: 'Yopougon, Marché Central',
+      deliveryAddress: 'Attécoubé, Route de Bassam',
+      distance: 9.5,
+      estimatedTime: '30 min',
+      price: 3000,
+      packageType: 'Colis général',
+      designation: 'Test Annonce',
+      weight: 5,
+      volume: 0.5,
+      options: ['Livraison'],
+      deliveryType: 'Express 48h',
+      urgency: 'normal',
+      customerRating: 4.7
     }
   ])
 
