@@ -3,115 +3,15 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Phone, Mail, MapPin, Home, ArrowRight, ArrowLeft, Target, Sparkles, Circle, Globe, Building, Navigation } from 'lucide-react';
 
-interface RecipientData {
-  recipientName: string;
-  recipientPhone: string;
-  recipientEmail: string;
-  recipientCountry: string;
-  recipientRegion: string;
-  recipientCity: string;
-  recipientAddress: string;
-  recipientLieuDit: string;
-}
-
-interface RecipientInfoStepProps {
-  initialData: RecipientData;
-  onContinue: (data: RecipientData) => void;
-  onBack: () => void;
-}
-
-// Données des pays et régions (identiques à SenderInfoStep)
-const countries = {
-  cameroun: {
-    name: 'Cameroun',
-    regions: {
-      'centre': {
-        name: 'Centre',
-        cities: ['Yaoundé', 'Mbalmayo', 'Akonolinga', 'Bafia', 'Ntui', 'Mfou', 'Obala', 'Okola', 'Soa']
-      },
-      'littoral': {
-        name: 'Littoral', 
-        cities: ['Douala', 'Edéa', 'Nkongsamba', 'Yabassi', 'Loum', 'Manjo', 'Mbanga', 'Mouanko']
-      },
-      'ouest': {
-        name: 'Ouest',
-        cities: ['Bafoussam', 'Dschang', 'Bandjoun', 'Mbouda', 'Bangangté', 'Foumban', 'Kékem']
-      },
-      'nord-ouest': {
-        name: 'Nord-Ouest',
-        cities: ['Bamenda', 'Kumbo', 'Wum', 'Ndop', 'Mbengwi', 'Bali', 'Bafut']
-      },
-      'sud-ouest': {
-        name: 'Sud-Ouest', 
-        cities: ['Buéa', 'Limbe', 'Kumba', 'Mamfe', 'Tiko', 'Idenau', 'Fontem']
-      },
-      'adamaoua': {
-        name: 'Adamaoua',
-        cities: ['Ngaoundéré', 'Meiganga', 'Tibati', 'Tignère', 'Banyo', 'Kontcha']
-      },
-      'nord': {
-        name: 'Nord',
-        cities: ['Garoua', 'Maroua', 'Guider', 'Figuil', 'Poli', 'Rey-Bouba', 'Tcholliré']
-      },
-      'extreme-nord': {
-        name: 'Extrême-Nord',
-        cities: ['Maroua', 'Mokolo', 'Kousséri', 'Yagoua', 'Mora', 'Waza', 'Kaélé']
-      },
-      'est': {
-        name: 'Est',
-        cities: ['Bertoua', 'Batouri', 'Abong-Mbang', 'Yokadouma', 'Kenzou', 'Garoua-Boulaï']
-      },
-      'sud': {
-        name: 'Sud',
-        cities: ['Ebolowa', 'Sangmélima', 'Kribi', 'Ambam', 'Lolodorf', 'Campo', 'Mvangane']
-      }
-    }
-  },
-  nigeria: {
-    name: 'Nigeria',
-    regions: {
-      'lagos': {
-        name: 'Lagos',
-        cities: ['Lagos', 'Ikeja', 'Epe', 'Ikorodu', 'Badagry', 'Mushin', 'Alimosho']
-      },
-      'abuja': {
-        name: 'Abuja FCT',
-        cities: ['Abuja', 'Gwagwalada', 'Kuje', 'Abaji', 'Bwari', 'Kwali']
-      },
-      'kano': {
-        name: 'Kano',
-        cities: ['Kano', 'Wudil', 'Gwarzo', 'Rano', 'Karaye', 'Rimin Gado']
-      },
-      'rivers': {
-        name: 'Rivers',
-        cities: ['Port Harcourt', 'Obio-Akpor', 'Eleme', 'Ikwerre', 'Oyigbo', 'Okrika']
-      },
-      'oyo': {
-        name: 'Oyo',
-        cities: ['Ibadan', 'Ogbomoso', 'Oyo', 'Iseyin', 'Saki', 'Igboho', 'Eruwa']
-      },
-      'kaduna': {
-        name: 'Kaduna', 
-        cities: ['Kaduna', 'Zaria', 'Kafanchan', 'Kagoro', 'Zonkwa', 'Makarfi']
-      },
-      'ogun': {
-        name: 'Ogun',
-        cities: ['Abeokuta', 'Sagamu', 'Ijebu-Ode', 'Ota', 'Ilaro', 'Ayetoro']
-      },
-      'anambra': {
-        name: 'Anambra',
-        cities: ['Awka', 'Onitsha', 'Nnewi', 'Ekwulobia', 'Agulu', 'Ihiala']
-      }
-    }
-  }
-} as const;
+import { RecipientData, RecipientInfoStepProps } from '@/types/package';
+import { countries, CountryKey } from '@/lib/utils';
 
 // Add type definitions for better type safety
-type CountryKey = keyof typeof countries;
 type RegionData = {
   name: string;
   cities: string[];
 };
+
 
 const FloatingIcon = ({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) => (
   <motion.div

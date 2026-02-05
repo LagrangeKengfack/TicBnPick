@@ -20,31 +20,7 @@ import {
   MdDeliveryDining
 } from 'react-icons/md';
 
-// --- Interface de Données Corrigée ---
-interface PackageData {
-  photo: File | string | null; // MODIFICATION ICI: Accept string for URL/Base64
-  designation: string;
-  description: string;
-  weight: string;
-  length: string;
-  width: string;
-  height: string;
-  isFragile: boolean;
-  isPerishable: boolean;
-  isLiquid: boolean;
-  isInsured: boolean;
-  declaredValue: string;
-  transportMethod: 'truck' | 'tricycle' | 'moto' | 'bike' | 'car' | ''; // << CORRIGÉ: Renommage de 'logistics'
-  logistics: 'standard' | 'express_48h' | 'express_24h';              // << CORRIGÉ: Nouvelle propriété pour la vitesse
-  pickup: boolean;
-  delivery: boolean;
-}
-
-interface PackageRegistrationProps {
-  initialData?: Partial<PackageData>;
-  onContinue: (data: PackageData, totalPrice: number) => void;
-  onBack?: () => void;
-}
+import { PackageData, PackageRegistrationProps } from '@/types/package';
 
 const LoadingDots = () => (
   <div className="flex space-x-1">
@@ -117,43 +93,52 @@ const OptionCard = ({ title, subtitle, icon, additionalCost, isSelected, onClick
   </div>
 );
 
-export default function PackageRegistration({ initialData = {}, onContinue, onBack }: PackageRegistrationProps) {
+export default function PackageRegistration({
+  initialData = {},
+  onContinue,
+  onBack,
+}: PackageRegistrationProps) {
   // << CORRIGÉ: Initialisation de l'état avec la nouvelle structure
   const [packageData, setPackageData] = useState<PackageData>({
     photo: null,
-    designation: '',
-    description: '',
-    weight: '',
-    length: '',
-    width: '',
-    height: '',
+    designation: "",
+    description: "",
+    weight: "",
+    length: "",
+    width: "",
+    height: "",
     isFragile: false,
     isPerishable: false,
     isLiquid: false,
     isInsured: false,
-    declaredValue: '',
-    transportMethod: '',
-    logistics: 'standard',
+    declaredValue: "",
+    transportMethod: "",
+    logistics: "standard",
     pickup: false,
     delivery: false,
-    ...initialData
+    hasPackageNow: false,
+    exactPickupAddress: "",
+    coordinates: null,
+    ...initialData,
   });
 
-  const [expressOption, setExpressOption] = useState<'none' | '24h' | '48h'>('none');
+  const [expressOption, setExpressOption] = useState<"none" | "24h" | "48h">(
+    "none",
+  );
   const [priceLoading, setPriceLoading] = useState(false);
   const [price, setPrice] = useState<number | null>(null);
   const [volume, setVolume] = useState(0);
   const [isFormValid, setIsFormValid] = useState(false);
-  const [validationError, setValidationError] = useState<string>('');
-    // MODIFICATION: Initialisation sécurisée de la prévisualisation
+  const [validationError, setValidationError] = useState<string>("");
+  // MODIFICATION: Initialisation sécurisée de la prévisualisation
   const [photoPreview, setPhotoPreview] = useState<string | null>(() => {
-      if (!initialData?.photo) return null;
-      if (typeof initialData.photo === 'string') return initialData.photo;
-      // On ne peut pas créer d'ObjectUrl lors du SSR ou render initial pur sans side effect propre
-      // On laisse l'effet s'en charger si c'est un File
-      return null; 
+    if (!initialData?.photo) return null;
+    if (typeof initialData.photo === "string") return initialData.photo;
+    // On ne peut pas créer d'ObjectUrl lors du SSR ou render initial pur sans side effect propre
+    // On laisse l'effet s'en charger si c'est un File
+    return null;
   });
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -162,21 +147,27 @@ export default function PackageRegistration({ initialData = {}, onContinue, onBa
       packageData.designation.trim().length >= 3 &&
       packageData.weight.trim() &&
       !isNaN(parseFloat(packageData.weight)) &&
-      parseFloat(packageData.weight) > 0
+      parseFloat(packageData.weight) > 0,
     );
-    
+
     setIsFormValid(isValid);
-    
+
     if (!isValid) {
       if (!packageData.photo) {
-        setValidationError('Veuillez ajouter une photo du colis');
+        setValidationError("Veuillez ajouter une photo du colis");
       } else if (packageData.designation.trim().length < 3) {
-        setValidationError('La désignation doit contenir au moins 3 caractères');
-      } else if (!packageData.weight.trim() || isNaN(parseFloat(packageData.weight)) || parseFloat(packageData.weight) <= 0) {
-        setValidationError('Veuillez saisir un poids valide');
+        setValidationError(
+          "La désignation doit contenir au moins 3 caractères",
+        );
+      } else if (
+        !packageData.weight.trim() ||
+        isNaN(parseFloat(packageData.weight)) ||
+        parseFloat(packageData.weight) <= 0
+      ) {
+        setValidationError("Veuillez saisir un poids valide");
       }
     } else {
-      setValidationError('');
+      setValidationError("");
     }
   }, [packageData.photo, packageData.designation, packageData.weight]);
 
@@ -187,37 +178,37 @@ export default function PackageRegistration({ initialData = {}, onContinue, onBa
     }
 
     setPriceLoading(true);
-    
+
     const calculatePrice = () => {
       const weight = parseFloat(packageData.weight) || 0;
       const length = parseFloat(packageData.length) || 10;
       const width = parseFloat(packageData.width) || 10;
       const height = parseFloat(packageData.height) || 10;
-      
+
       const calculatedVolume = (length * width * height) / 1000000;
       const volumetricWeight = calculatedVolume * 200;
       const billableWeight = Math.max(weight, volumetricWeight);
-      
+
       setVolume(calculatedVolume);
-      
-      let basePrice = 1500 + (billableWeight * 300);
-      
+
+      let basePrice = 1500 + billableWeight * 300;
+
       if (packageData.isFragile) basePrice += 1200;
       if (packageData.isPerishable) basePrice += 800;
       if (packageData.isLiquid) basePrice += 500;
       if (packageData.isInsured && parseFloat(packageData.declaredValue) > 0) {
         basePrice += parseFloat(packageData.declaredValue) * 0.02;
       }
-      
+
       if (packageData.pickup) basePrice += 1000;
       if (packageData.delivery) basePrice += 1000;
-      
+
       let expressMultiplier = 1;
-      if (expressOption === '24h') expressMultiplier = 2.0;
-      else if (expressOption === '48h') expressMultiplier = 1.5;
-      
+      if (expressOption === "24h") expressMultiplier = 2.0;
+      else if (expressOption === "48h") expressMultiplier = 1.5;
+
       const finalPrice = Math.round(basePrice * expressMultiplier);
-      
+
       setTimeout(() => {
         setPrice(finalPrice);
         setPriceLoading(false);
@@ -228,14 +219,14 @@ export default function PackageRegistration({ initialData = {}, onContinue, onBa
   }, [packageData, expressOption, isFormValid]);
 
   const handleInputChange = (field: keyof PackageData, value: any) => {
-    setPackageData(prev => {
+    setPackageData((prev) => {
       const newData = { ...prev, [field]: value };
-      
+
       // Pré-remplir la description avec la désignation si la description est vide
-      if (field === 'designation' && value && !prev.description.trim()) {
+      if (field === "designation" && value && !prev.description.trim()) {
         newData.description = value;
       }
-      
+
       return newData;
     });
   };
@@ -244,26 +235,38 @@ export default function PackageRegistration({ initialData = {}, onContinue, onBa
     const file = event.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        alert('Le fichier est trop volumineux. Veuillez choisir une image de moins de 5MB.');
+        alert(
+          "Le fichier est trop volumineux. Veuillez choisir une image de moins de 5MB.",
+        );
         return;
       }
-      
-      handleInputChange('photo', file); // On stocke l'objet Fichier
+
+      handleInputChange("photo", file); // On stocke l'objet Fichier
       setPhotoPreview(URL.createObjectURL(file)); // On crée une URL locale pour l'aperçu
-      
+
       const reader = new FileReader();
       reader.onload = (e) => {
-        handleInputChange('photo', e.target?.result as string);
+        handleInputChange("photo", e.target?.result as string);
       };
       reader.readAsDataURL(file);
     }
   };
 
   const validateNumberInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight'];
-    if (allowedKeys.includes(e.key) || 
-        (e.key >= '0' && e.key <= '9') || 
-        (e.key === '.' && !e.currentTarget.value.includes('.'))) {
+    const allowedKeys = [
+      "Backspace",
+      "Delete",
+      "Tab",
+      "Escape",
+      "Enter",
+      "ArrowLeft",
+      "ArrowRight",
+    ];
+    if (
+      allowedKeys.includes(e.key) ||
+      (e.key >= "0" && e.key <= "9") ||
+      (e.key === "." && !e.currentTarget.value.includes("."))
+    ) {
       return;
     }
     e.preventDefault();
@@ -276,61 +279,133 @@ export default function PackageRegistration({ initialData = {}, onContinue, onBa
   };
 
   const logisticsOptions = [
-    { key: 'truck', label: 'Camion', icon: <TruckIcon className="w-4 h-4" /> },
-    { key: 'tricycle', label: 'Tricycle', icon: < MdDeliveryDining className="w-4 h-4" /> },
-    { key: 'moto', label: 'Moto', icon: <Bike className="w-4 h-4" /> },
-    { key: 'bike', label: 'Vélo', icon: <BsBicycle className="w-4 h-4" /> },
-    { key: 'car', label: 'Voiture', icon: <Car className="w-4 h-4" /> }
+    { key: "truck", label: "Camion", icon: <TruckIcon className="w-4 h-4" /> },
+    {
+      key: "tricycle",
+      label: "Tricycle",
+      icon: <MdDeliveryDining className="w-4 h-4" />,
+    },
+    { key: "moto", label: "Moto", icon: <Bike className="w-4 h-4" /> },
+    { key: "bike", label: "Vélo", icon: <BsBicycle className="w-4 h-4" /> },
+    { key: "car", label: "Voiture", icon: <Car className="w-4 h-4" /> },
   ];
+
+  // --- NEW: SMART PICKUP LOGIC ---
+  const [loadingLoc, setLoadingLoc] = useState(false);
+
+  const handleSmartPickup = async () => {
+    if (!navigator.geolocation) {
+      alert("La géolocalisation n'est pas supportée par votre navigateur.");
+      return;
+    }
+
+    setLoadingLoc(true);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+
+        try {
+          // Reverse Geocoding using OpenStreetMap (Free)
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18`,
+            { headers: { "Accept-Language": "fr" } },
+          );
+          const data = await response.json();
+          const address = data.display_name || "Adresse détectée";
+
+          // Update state with coordinates and address
+          setPackageData((prev) => ({
+            ...prev,
+            hasPackageNow: true,
+            exactPickupAddress: address,
+            coordinates: { lat: latitude, lng: longitude },
+          }));
+        } catch (error) {
+          console.error("Geocoding error", error);
+          alert("Erreur lors de la récupération de l'adresse.");
+        } finally {
+          setLoadingLoc(false);
+        }
+      },
+      (error) => {
+        setLoadingLoc(false);
+        alert(
+          "Veuillez autoriser l'accès à la position dans votre navigateur.",
+        );
+      },
+    );
+  };
 
   return (
     <div className="max-w-7xl mx-auto p-4 min-h-screen bg-gray-50 dark:bg-transparent transition-colors">
       <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-1">Enregistrement du colis</h1>
-        <p className="text-gray-600 dark:text-gray-400 text-sm">Décrivez votre colis pour obtenir une estimation précise</p>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-1">
+          Enregistrement du colis
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 text-sm">
+          Décrivez votre colis pour obtenir une estimation précise
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
-          
           {/* Photo du colis */}
           <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center mb-3">
               <PhotoIcon className="w-4 h-4 text-orange-500 mr-2" />
-              <h3 className="font-semibold text-gray-800 dark:text-gray-200">Photo du colis <span className="text-red-500">*</span></h3>
+              <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+                Photo du colis <span className="text-red-500">*</span>
+              </h3>
             </div>
-            
+
             {!packageData.photo ? (
-              <div 
+              <div
                 onClick={() => fileInputRef.current?.click()}
                 className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center cursor-pointer hover:border-orange-400 dark:hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-orange-950/20 transition-colors"
               >
                 <PhotoIcon className="w-8 h-8 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
-                <p className="text-gray-600 dark:text-gray-300 font-medium text-sm">Cliquez pour ajouter une photo</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">PNG, JPG jusqu'à 5MB</p>
+                <p className="text-gray-600 dark:text-gray-300 font-medium text-sm">
+                  Cliquez pour ajouter une photo
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  PNG, JPG jusqu'à 5MB
+                </p>
               </div>
             ) : (
               <div className="relative inline-block">
-                <img src={packageData.photo} alt="Colis" className="w-32 h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-600" />
+                <img
+                  src={packageData.photo}
+                  alt="Colis"
+                  className="w-32 h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
+                />
                 <button
-                  onClick={() => handleInputChange('photo', null)}
+                  onClick={() => handleInputChange("photo", null)}
                   className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
                 >
                   <XCircleIcon className="w-4 h-4" />
                 </button>
               </div>
             )}
-            
-            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
           </div>
 
           {/* Informations de base */}
           <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center mb-3">
               <ShoppingBagIcon className="w-4 h-4 text-orange-500 mr-2" />
-              <h3 className="font-semibold text-gray-800 dark:text-gray-200">Informations de base</h3>
+              <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+                Informations de base
+              </h3>
             </div>
-            
+
             <div className="space-y-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -339,17 +414,23 @@ export default function PackageRegistration({ initialData = {}, onContinue, onBa
                 <input
                   type="text"
                   value={packageData.designation}
-                  onChange={(e) => handleInputChange('designation', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("designation", e.target.value)
+                  }
                   placeholder="Ex: Vêtements, Livres, Électronique..."
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                 />
               </div>
-              
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description détaillée</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Description détaillée
+                </label>
                 <textarea
                   value={packageData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
                   placeholder="Décrivez le contenu de votre colis..."
                   rows={2}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
@@ -362,53 +443,67 @@ export default function PackageRegistration({ initialData = {}, onContinue, onBa
           <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
             <div className="flex items-center mb-3">
               <ScaleIcon className="w-4 h-4 text-orange-500 mr-2" />
-              <h3 className="font-semibold text-gray-800 dark:text-gray-200">Poids et dimensions</h3>
+              <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+                Poids et dimensions
+              </h3>
             </div>
-            
+
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Poids (kg) <span className="text-red-500">*</span></label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Poids (kg) <span className="text-red-500">*</span>
+                </label>
                 <input
                   type="text"
                   value={packageData.weight}
-                  onChange={(e) => handleInputChange('weight', e.target.value)}
+                  onChange={(e) => handleInputChange("weight", e.target.value)}
                   onKeyDown={validateNumberInput}
                   placeholder="1.5"
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                 />
               </div>
-              
+
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Longueur (cm)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Longueur (cm)
+                  </label>
                   <input
                     type="text"
                     value={packageData.length}
-                    onChange={(e) => handleInputChange('length', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("length", e.target.value)
+                    }
                     onKeyDown={validateNumberInput}
                     placeholder="20"
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                   />
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Largeur (cm)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Largeur (cm)
+                  </label>
                   <input
                     type="text"
                     value={packageData.width}
-                    onChange={(e) => handleInputChange('width', e.target.value)}
+                    onChange={(e) => handleInputChange("width", e.target.value)}
                     onKeyDown={validateNumberInput}
                     placeholder="15"
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                   />
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Hauteur (cm)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Hauteur (cm)
+                  </label>
                   <input
                     type="text"
                     value={packageData.height}
-                    onChange={(e) => handleInputChange('height', e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("height", e.target.value)
+                    }
                     onKeyDown={validateNumberInput}
                     placeholder="10"
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
@@ -420,52 +515,66 @@ export default function PackageRegistration({ initialData = {}, onContinue, onBa
 
           {/* Options spéciales */}
           <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-            <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">Options spéciales</h3>
-            
+            <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">
+              Options spéciales
+            </h3>
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <OptionCard
                 title="Fragile"
                 icon={<ExclamationTriangleIcon className="w-4 h-4" />}
                 additionalCost={1200}
                 isSelected={packageData.isFragile}
-                onClick={() => handleInputChange('isFragile', !packageData.isFragile)}
+                onClick={() =>
+                  handleInputChange("isFragile", !packageData.isFragile)
+                }
                 compact={true}
               />
-              
+
               <OptionCard
                 title="Périssable"
                 icon={<Flame className="w-4 h-4" />}
                 additionalCost={800}
                 isSelected={packageData.isPerishable}
-                onClick={() => handleInputChange('isPerishable', !packageData.isPerishable)}
+                onClick={() =>
+                  handleInputChange("isPerishable", !packageData.isPerishable)
+                }
                 compact={true}
               />
-              
+
               <OptionCard
                 title="Liquide"
                 icon={<Droplets className="w-4 h-4" />}
                 additionalCost={500}
                 isSelected={packageData.isLiquid}
-                onClick={() => handleInputChange('isLiquid', !packageData.isLiquid)}
+                onClick={() =>
+                  handleInputChange("isLiquid", !packageData.isLiquid)
+                }
                 compact={true}
               />
-              
+
               <OptionCard
                 title="Assuré"
                 icon={<Shield className="w-4 h-4" />}
                 isSelected={packageData.isInsured}
-                onClick={() => handleInputChange('isInsured', !packageData.isInsured)}
+                onClick={() =>
+                  handleInputChange("isInsured", !packageData.isInsured)
+                }
                 compact={true}
               />
             </div>
-            
+
             {packageData.isInsured && (
               <div className="mt-3">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Valeur déclarée (FCFA)</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Valeur déclarée (FCFA)
+                </label>
                 <input
                   type="text"
                   value={packageData.declaredValue}
-                  onChange={(e) => handleInputChange('declaredValue', e.target.value)}
+                  onChange={(e) =>
+                    handleInputChange("declaredValue", e.target.value)
+                  }
                   onKeyDown={validateNumberInput}
                   placeholder="50000"
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
@@ -476,74 +585,146 @@ export default function PackageRegistration({ initialData = {}, onContinue, onBa
 
           {/* Choix de la logistique */}
           <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-            <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">Moyen de transport (optionnel)</h3>
+            <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">
+              Moyen de transport (optionnel)
+            </h3>
             <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
-              {logisticsOptions.map(option => (
+              {logisticsOptions.map((option) => (
                 <OptionCard
                   key={option.key}
                   title={option.label}
                   icon={option.icon}
                   isSelected={packageData.logistics === option.key}
-                  onClick={() => handleInputChange('logistics', packageData.logistics === option.key ? '' : option.key)}
+                  onClick={() =>
+                    handleInputChange(
+                      "logistics",
+                      packageData.logistics === option.key ? "" : option.key,
+                    )
+                  }
                   compact={true}
                 />
               ))}
             </div>
           </div>
 
-          {/* Services additionnels */}
+          {/* Services additionnels & Smart Pickup */}
           <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-            <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">Services additionnels</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">
+              Options de ramassage
+            </h3>
+
+            <div className="space-y-4">
+              {/* Smart Pickup Button */}
+              <div className="p-4 bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <MapPinIcon className="w-5 h-5 text-orange-600" />
+                    <div>
+                      <p className="text-sm font-bold text-orange-900 dark:text-orange-100">
+                        Avez-vous le colis avec vous ?
+                      </p>
+                      <p className="text-xs text-orange-700 dark:text-orange-300">
+                        Nous pouvons vous localiser pour le coursier
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={handleSmartPickup}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-bold text-xs transition-all ${
+                      packageData.hasPackageNow
+                        ? "bg-green-600 text-white"
+                        : "bg-orange-500 text-white hover:bg-orange-600"
+                    }`}
+                  >
+                    {loadingLoc ? (
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <CheckCircleIcon className="w-4 h-4" />
+                    )}
+                    {packageData.hasPackageNow
+                      ? "Position Validée"
+                      : "Oui, localisez-moi"}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPackageData((prev) => ({
+                        ...prev,
+                        hasPackageNow: false,
+                        exactPickupAddress: "",
+                        coordinates: null,
+                      }))
+                    }
+                    className="py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-400"
+                  >
+                    Non
+                  </button>
+                </div>
+
+                {/* Automated Address Field */}
+                {packageData.exactPickupAddress && (
+                  <div className="mt-3 animate-in fade-in slide-in-from-top-1">
+                    <label className="text-[10px] font-bold text-orange-600 uppercase mb-1 block">
+                      Adresse de ramassage détectée
+                    </label>
+                    <div className="flex items-start gap-2 bg-white dark:bg-gray-700 p-2 rounded border border-orange-200 dark:border-orange-900">
+                      <MapPinIcon className="w-4 h-4 text-orange-500 mt-0.5 flex-shrink-0" />
+                      <p className="text-xs text-gray-700 dark:text-gray-200 italic leading-tight">
+                        {packageData.exactPickupAddress}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Standard Home Pickup Card */}
               <OptionCard
-                title="Récupération à domicile"
-                subtitle="Un livreur vient chercher le colis"
+                title="Récupération à domicile programmée"
+                subtitle="Un livreur vient chercher le colis plus tard"
                 icon={<HomeIcon className="w-4 h-4" />}
                 additionalCost={1000}
                 isSelected={packageData.pickup}
-                onClick={() => handleInputChange('pickup', !packageData.pickup)}
-              />
-              
-              <OptionCard
-                title="Livraison à domicile"
-                subtitle="Livraison directe au destinataire"
-                icon={<MapPinIcon className="w-4 h-4" />}
-                additionalCost={1000}
-                isSelected={packageData.delivery}
-                onClick={() => handleInputChange('delivery', !packageData.delivery)}
+                onClick={() => handleInputChange("pickup", !packageData.pickup)}
               />
             </div>
           </div>
 
           {/* Livraison express */}
           <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-            <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">Livraison express</h3>
-            
+            <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3">
+              Livraison express
+            </h3>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <OptionCard
                 title="Standard"
                 subtitle="3-5 jours ouvrables"
                 icon={<TruckIcon className="w-4 h-4" />}
-                isSelected={expressOption === 'none'}
-                onClick={() => setExpressOption('none')}
+                isSelected={expressOption === "none"}
+                onClick={() => setExpressOption("none")}
                 compact={true}
               />
-              
+
               <OptionCard
                 title="Express 48h"
                 subtitle="Livraison en 2 jours"
                 icon={<ClockIcon className="w-4 h-4" />}
-                isSelected={expressOption === '48h'}
-                onClick={() => setExpressOption('48h')}
+                isSelected={expressOption === "48h"}
+                onClick={() => setExpressOption("48h")}
                 compact={true}
               />
-              
+
               <OptionCard
                 title="Express 24h"
                 subtitle="Livraison en 1 jour"
                 icon={<Zap className="w-4 h-4" />}
-                isSelected={expressOption === '24h'}
-                onClick={() => setExpressOption('24h')}
+                isSelected={expressOption === "24h"}
+                onClick={() => setExpressOption("24h")}
                 compact={true}
               />
             </div>
@@ -557,51 +738,102 @@ export default function PackageRegistration({ initialData = {}, onContinue, onBa
               <Package className="w-4 h-4 mr-2" />
               Résumé du colis
             </h3>
-            
+
             {/* Photo dans le résumé */}
             {packageData.photo && (
               <div className="mb-3 text-center">
-                <img src={packageData.photo} alt="Colis" className="w-20 h-20 object-cover rounded-lg mx-auto border border-orange-200 dark:border-orange-700" />
+                <img
+                  src={packageData.photo}
+                  alt="Colis"
+                  className="w-20 h-20 object-cover rounded-lg mx-auto border border-orange-200 dark:border-orange-700"
+                />
               </div>
             )}
-            
+
             <div className="space-y-2 mb-4 text-sm">
               <div>
-                <span className="font-medium text-gray-600 dark:text-gray-400">Désignation:</span>
-                <p className="text-gray-800 dark:text-gray-200 font-semibold">{packageData.designation || '...'}</p>
+                <span className="font-medium text-gray-600 dark:text-gray-400">
+                  Désignation:
+                </span>
+                <p className="text-gray-800 dark:text-gray-200 font-semibold">
+                  {packageData.designation || "..."}
+                </p>
               </div>
-              
+
               <div>
-                <span className="font-medium text-gray-600 dark:text-gray-400">Poids:</span>
-                <p className="text-gray-800 dark:text-gray-200 font-semibold">{packageData.weight ? `${packageData.weight} kg` : '...'}</p>
+                <span className="font-medium text-gray-600 dark:text-gray-400">
+                  Poids:
+                </span>
+                <p className="text-gray-800 dark:text-gray-200 font-semibold">
+                  {packageData.weight ? `${packageData.weight} kg` : "..."}
+                </p>
               </div>
-              
+
               {volume > 0 && (
                 <div>
-                  <span className="font-medium text-gray-600 dark:text-gray-400">Volume:</span>
-                  <p className="text-gray-800 dark:text-gray-200 font-semibold">{volume.toFixed(3)} m³</p>
+                  <span className="font-medium text-gray-600 dark:text-gray-400">
+                    Volume:
+                  </span>
+                  <p className="text-gray-800 dark:text-gray-200 font-semibold">
+                    {volume.toFixed(3)} m³
+                  </p>
                 </div>
               )}
-              
+
               {/* Options actives */}
-              {(packageData.isFragile || packageData.isPerishable || packageData.isLiquid || packageData.isInsured || packageData.pickup || packageData.delivery) && (
+              {(packageData.isFragile ||
+                packageData.isPerishable ||
+                packageData.isLiquid ||
+                packageData.isInsured ||
+                packageData.pickup ||
+                packageData.delivery) && (
                 <div>
-                  <span className="font-medium text-gray-600 dark:text-gray-400">Options:</span>
+                  <span className="font-medium text-gray-600 dark:text-gray-400">
+                    Options:
+                  </span>
                   <div className="flex flex-wrap gap-1 mt-1">
-                    {packageData.isFragile && <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-xs rounded-full">Fragile</span>}
-                    {packageData.isPerishable && <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-xs rounded-full">Périssable</span>}
-                    {packageData.isLiquid && <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-xs rounded-full">Liquide</span>}
-                    {packageData.isInsured && <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-xs rounded-full">Assuré</span>}
-                    {packageData.pickup && <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-xs rounded-full">Récupération</span>}
-                    {packageData.delivery && <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-xs rounded-full">Livraison</span>}
+                    {packageData.isFragile && (
+                      <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-xs rounded-full">
+                        Fragile
+                      </span>
+                    )}
+                    {packageData.isPerishable && (
+                      <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-xs rounded-full">
+                        Périssable
+                      </span>
+                    )}
+                    {packageData.isLiquid && (
+                      <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-xs rounded-full">
+                        Liquide
+                      </span>
+                    )}
+                    {packageData.isInsured && (
+                      <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-xs rounded-full">
+                        Assuré
+                      </span>
+                    )}
+                    {packageData.pickup && (
+                      <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-xs rounded-full">
+                        Récupération
+                      </span>
+                    )}
+                    {packageData.delivery && (
+                      <span className="px-2 py-1 bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 text-xs rounded-full">
+                        Livraison
+                      </span>
+                    )}
                   </div>
                 </div>
               )}
-              
-              {expressOption !== 'none' && (
+
+              {expressOption !== "none" && (
                 <div>
-                  <span className="font-medium text-gray-600 dark:text-gray-400">Livraison:</span>
-                  <p className="text-gray-800 dark:text-gray-200 font-semibold">Express {expressOption === '24h' ? '24h' : '48h'}</p>
+                  <span className="font-medium text-gray-600 dark:text-gray-400">
+                    Livraison:
+                  </span>
+                  <p className="text-gray-800 dark:text-gray-200 font-semibold">
+                    Express {expressOption === "24h" ? "24h" : "48h"}
+                  </p>
                 </div>
               )}
             </div>
@@ -609,29 +841,41 @@ export default function PackageRegistration({ initialData = {}, onContinue, onBa
             {/* Prix de manutention */}
             <div className="border-t-2 border-dashed border-orange-200 dark:border-orange-700 pt-3 mb-4">
               <div className="text-center">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Prix de manutention</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                  Prix de manutention
+                </p>
                 {priceLoading ? (
                   <div className="flex items-center justify-center space-x-2">
                     <LoadingDots />
-                    <span className="text-xs text-gray-500 dark:text-gray-400">Calcul...</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      Calcul...
+                    </span>
                   </div>
                 ) : price !== null ? (
                   <div>
                     <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                       {price.toLocaleString()}
-                      <span className="text-sm font-normal text-gray-500 dark:text-gray-400 ml-1">FCFA</span>
+                      <span className="text-sm font-normal text-gray-500 dark:text-gray-400 ml-1">
+                        FCFA
+                      </span>
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Manutention uniquement</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Manutention uniquement
+                    </p>
                   </div>
                 ) : (
-                  <p className="text-gray-500 dark:text-gray-400 text-xs">Complétez le formulaire</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs">
+                    Complétez le formulaire
+                  </p>
                 )}
               </div>
             </div>
 
             {validationError && (
               <div className="mb-3 p-2 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded-md">
-                <p className="text-red-700 dark:text-red-400 text-xs font-medium">{validationError}</p>
+                <p className="text-red-700 dark:text-red-400 text-xs font-medium">
+                  {validationError}
+                </p>
               </div>
             )}
 
@@ -641,14 +885,14 @@ export default function PackageRegistration({ initialData = {}, onContinue, onBa
                 disabled={!isFormValid || price === null}
                 className={`w-full flex items-center justify-center py-2 px-3 rounded-md font-semibold text-sm transition-all ${
                   isFormValid && price !== null
-                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-md hover:shadow-lg'
-                    : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'
+                    ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-md hover:shadow-lg"
+                    : "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
                 }`}
               >
                 Continuer vers les adresses
                 <ArrowRight className="w-4 h-4 ml-2" />
               </button>
-              
+
               {onBack && (
                 <button
                   onClick={onBack}

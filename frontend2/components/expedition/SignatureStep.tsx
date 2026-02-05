@@ -3,10 +3,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { PencilIcon, TrashIcon, CheckCircleIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { motion } from 'framer-motion';
 
-interface SignatureStepProps {
-  onBack: () => void;
-  onSubmit: (signatureData: string) => void;
-}
+import { SignatureStepProps } from '@/types/package';
 
 export default function SignatureStep({ onBack, onSubmit }: SignatureStepProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);

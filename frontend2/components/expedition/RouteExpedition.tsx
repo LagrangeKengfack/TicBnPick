@@ -7,28 +7,9 @@ import MapLeaflet from '@/components/MapLeaflet'
 import { geocode } from '@/services/geocoding'
 import { getRoute } from '@/services/routing'
 import type { GeoJSON } from 'geojson'
+import { RouteData, RouteSelectionStepProps } from '@/types/package'
+import { calculateTravelPrice } from '@/lib/utils'
 
-interface RouteData {
-  departurePointId: string | null
-  arrivalPointId: string | null
-  departurePointName: string
-  arrivalPointName: string
-  distanceKm: number
-}
-
-interface RouteSelectionStepProps {
-  onContinue: (data: RouteData, travelPrice: number) => void
-  onBack: () => void
-  initialDepartureAddress?: string
-  initialArrivalAddress?: string
-}
-
-const calculateTravelPrice = (distance: number) => {
-  if (distance <= 0) return 0
-  const baseFee = 500
-  const pricePerKm = 80
-  return Math.round(baseFee + distance * pricePerKm)
-}
 
 export default function RouteSelectionStep({ onContinue, onBack, initialDepartureAddress, initialArrivalAddress }: RouteSelectionStepProps) {
   const [routeData, setRouteData] = useState<RouteData>({

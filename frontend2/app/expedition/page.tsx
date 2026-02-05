@@ -21,97 +21,23 @@ import {
 } from '@heroicons/react/24/solid';
 import { supabase } from '@/lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
-import SenderInfoStep from './SenderInfoStep';
-import RecipientInfoStep from './RecipientInfoStep';
-import PackageInfoStep from './FormulaireColisExpedition';
-import RouteSelectionStep from './RouteExpedition';
-import SignatureStep from './SignatureStep';
-import PaymentStep from './PaymentStepExpedition';
-import NavbarHome from '@/components/NavbarHome';
+import SenderInfoStep from '../../components/expedition/SenderInfoStep';
+import RecipientInfoStep from '../../components/expedition/RecipientInfoStep';
+import PackageInfoStep from '../../components/expedition/FormulaireColisExpedition';
+import RouteSelectionStep from '../../components/expedition/RouteExpedition';
+import SignatureStep from '../../components/expedition/SignatureStep';
+import PaymentStep from '../../components/expedition/PaymentStepExpedition';
 import { CheckCircleIcon, PrinterIcon } from '@heroicons/react/24/outline';
 import { UserPlusIcon } from 'lucide-react';
 import jsPDF from 'jspdf';
 import OriginalQRCode from 'qrcode';
 import { useAuth } from '@/context/AuthContext';
 import { packageService, PackageCreationPayload } from '@/services/packageService';
-
+import { SenderData, RecipientData,  PackageData, RouteData, SignatureData, ExpeditionFormData, LoggedInUser } from '@/types/package';
 const EXPEDITION_FORM_STORAGE_KEY = 'expedition_form_in_progress';
 
-interface ExpeditionFormData {
-  currentStep: number;
-  senderData: SenderData;
-  recipientData: RecipientData;
-  packageData: PackageData;
-  routeData: RouteData;
-  signatureData: SignatureData;
-  pricing: {
-    basePrice: number;
-    travelPrice: number;
-    operatorFee: number;
-    totalPrice: number;
-  };
-}
 
-interface SenderData {
-  senderName: string;
-  senderPhone: string;
-  senderEmail: string;      // Ajouté
-  senderCountry: string;    // Ajouté
-  senderRegion: string;     // Ajouté
-  senderCity: string;       // Ajouté
-  senderAddress: string;
-  senderLieuDit: string;
-}
 
-// 2. Mise à jour de l'interface RecipientData
-interface RecipientData {
-  recipientName: string;
-  recipientPhone: string;
-  recipientEmail: string;
-  recipientCountry: string; // Ajouté
-  recipientRegion: string;  // Ajouté
-  recipientCity: string;    // Ajouté
-  recipientAddress: string;
-  recipientLieuDit: string;
-  // Les champs genre et age n'existent pas dans le composant enfant, on les retire pour la cohérence
-}
-// << CORRIGÉ: Mise à jour de l'interface PackageData >>
-interface PackageData {
-  photo: File | string | null;
-  designation: string;
-  description: string;
-  weight: string;
-  length: string;
-  width: string;
-  height: string;
-  isFragile: boolean;
-  isPerishable: boolean;
-  isLiquid: boolean;
-  isInsured: boolean;
-  declaredValue: string;
-  transportMethod: 'truck' | 'tricycle' | 'moto' | 'bike' | 'car' | ''; // Renommage
-  logistics: 'standard' | 'express_48h' | 'express_24h';              // Nouveau champ
-  pickup: boolean;
-  delivery: boolean;
-}
-interface RouteData {
-  departurePointId: string | null;
-  arrivalPointId: string | null;
-  departurePointName: string;
-  arrivalPointName: string;
-  distanceKm: number;
-}
-interface SignatureData {
-  signatureUrl: string | null;
-}
-interface LoggedInUser {
-  id: string;
-  full_name: string | null;
-  phone: string | null;
-  email?: string;
-  address?: string | null;
-  lieu_dit?: string | null;
-}
 
 const STORAGE_KEY = 'shipping_form_temp_data_v2';
 
@@ -198,7 +124,7 @@ export default function ShippingPage() {
       isFragile: false, isPerishable: false, isLiquid: false, isInsured: false, declaredValue: '', 
       transportMethod: '',
       logistics: 'standard',
-      pickup: false, delivery: false 
+      pickup: false, delivery: false, hasPackageNow: false , exactPickupAddress: '', coordinates: null
     },
     routeData: { departurePointId: null, arrivalPointId: null, departurePointName: '', arrivalPointName: '', distanceKm: 0 },
     signatureData: { signatureUrl: null },
