@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -25,7 +26,13 @@ import {
   LogOut,
   X,
   MoreHorizontal,
+  MapPin,
+  Bike,
+  Car,
 } from 'lucide-react'
+import { TruckIcon } from '@heroicons/react/24/outline'
+import { MdDeliveryDining } from 'react-icons/md'
+import { BsBicycle } from 'react-icons/bs'
 
 // Types
 interface DeliveryPersonRequest {
@@ -63,19 +70,34 @@ type ActiveView = 'dashboard' | 'registrations' | 'accounts'
 
 export default function SuperAdminDashboard() {
   const { toast } = useToast()
+  const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [selectedRequest, setSelectedRequest] = useState<DeliveryPersonRequest | null>(null)
   const [selectedAccount, setSelectedAccount] = useState<Account | null>(null)
-  const [actionDialog, setActionDialog] = useState<'approve' | 'reject' | 'suspend' | 'revoke' | null>(null)
+  const [actionDialog, setActionDialog] = useState<'approve' | 'reject' | 'suspend' | 'revoke' | 'restore' | null>(null)
   const [activeView, setActiveView] = useState<ActiveView>('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const [registrationRequests, setRegistrationRequests] = useState<DeliveryPersonRequest[]>([])
   const [accounts, setAccounts] = useState<Account[]>([])
+  
+  // Filtres pour la page comptes
+  const [accountTypeFilter, setAccountTypeFilter] = useState<'all' | 'DELIVERY' | 'CLIENT'>('all')
+  const [searchQuery, setSearchQuery] = useState('')
 
   // Super admin info
   const superAdminName = 'Charles Henry'
+
+  const handleLogout = () => {
+    router.push('/')
+  }
+
+  const sidebarItems = [
+    { id: 'dashboard' as const, icon: LayoutDashboard, label: 'Dashboard' },
+    { id: 'registrations' as const, icon: UserCheck, label: 'Inscriptions' },
+    { id: 'accounts' as const, icon: ShieldCheck, label: 'Comptes' },
+  ]
 
   // Fetch data on component mount
   useEffect(() => {
@@ -138,6 +160,11 @@ export default function SuperAdminDashboard() {
   const handleRevokeAccount = (account: Account) => {
     setSelectedAccount(account)
     setActionDialog('revoke')
+  }
+
+  const handleRestoreAccount = (account: Account) => {
+    setSelectedAccount(account)
+    setActionDialog('restore')
   }
 
   const confirmAction = async () => {
@@ -203,6 +230,20 @@ export default function SuperAdminDashboard() {
         } else {
           throw new Error('Failed to revoke')
         }
+      } else if (actionDialog === 'restore' && selectedAccount) {
+        const response = await fetch(`/api/accounts/${selectedAccount.id}/restore`, {
+          method: 'POST'
+        })
+
+        if (response.ok) {
+          toast({
+            title: 'Compte restauré',
+            description: `Le compte de ${selectedAccount.name} a été restauré avec succès.`
+          })
+          await fetchAccounts()
+        } else {
+          throw new Error('Failed to restore')
+        }
       }
     } catch (error) {
       console.error('Error performing action:', error)
@@ -238,7 +279,9 @@ export default function SuperAdminDashboard() {
   const getRoleBadge = (role: string) => {
     switch (role) {
       case 'DELIVERY':
-        return <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">Livreur</Badge>
+        return <Badge variant="secondary" className="bg-orange-50 text-orange-700 border-orange-300">Livreur</Badge>
+      case 'CLIENT':
+        return <Badge variant="secondary" className="bg-white text-orange-700 border-orange-300">Client</Badge>
       case 'AGENCY':
         return <Badge variant="secondary" className="bg-purple-50 text-purple-700 border-purple-200">Agence</Badge>
       case 'POINT':
@@ -248,78 +291,46 @@ export default function SuperAdminDashboard() {
     }
   }
 
-  // Composants SVG personnalisés pour les icônes de véhicules - design exactement comme les images
+  // Fonction pour filtrer les comptes
+  const getFilteredAccounts = () => {
+    let filtered = accounts
+
+    // Filtre par type de compte
+    if (accountTypeFilter !== 'all') {
+      filtered = filtered.filter(account => account.role === accountTypeFilter)
+    }
+
+    // Filtre par recherche (nom, prénom, email)
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(account =>
+        account.name.toLowerCase().includes(query) ||
+        account.email.toLowerCase().includes(query)
+      )
+    }
+
+    return filtered
+  }
+
+  // Composants SVG personnalisés pour les icônes de véhicules - mêmes que dans FormulaireColisExpedition
   const VehicleIcon = ({ type }: { type: string }) => {
     const vehicleType = type.toLowerCase()
 
     if (vehicleType.includes('moto') || vehicleType.includes('motorcycle')) {
-      // MOTO - design minimaliste avec guidon, corps arrondi et deux roues
-      return (
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6">
-          <rect x="8" y="5" width="8" height="7" rx="1" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <circle cx="8" cy="16" r="2.5" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <circle cx="16" cy="16" r="2.5" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M10 9l2-3h2" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M12 8v1" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      )
+      return <Bike className="w-6 h-6 text-orange-500" />
     } else if (vehicleType.includes('tricycle') || vehicleType.includes('tricy')) {
-      // TRICYCLE - corps central arrondi avec trois roues (deux avant, une arrière)
-      return (
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6">
-          <ellipse cx="12" cy="8" rx="4" ry="3" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <circle cx="8" cy="18" r="2.5" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <circle cx="12" cy="18" r="2.5" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <circle cx="16" cy="18" r="2.5" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M12 11v-2" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      )
+      return <MdDeliveryDining className="w-6 h-6 text-orange-500" />
     } else if (vehicleType.includes('camion') || vehicleType.includes('truck')) {
-      // CAMION - corps rectangulaire avec cabine
-      return (
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6">
-          <path d="M3 10h10v8H3v-8z" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M13 10h8v8h-8v-8z" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M13 14v4h8v-4h-8z" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <circle cx="8" cy="20" r="2" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <circle cx="19" cy="20" r="2" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <rect x="5" y="8" width="3" height="2" rx="0.5" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      )
+      return <TruckIcon className="w-6 h-6 text-orange-500" />
+    } else if (vehicleType.includes('bus')) {
+      return <TruckIcon className="w-6 h-6 text-orange-500" />
     } else if (vehicleType.includes('voiture') || vehicleType.includes('car') || vehicleType.includes('auto')) {
-      // VOITURE - silhouète arrondie avec deux roues
-      return (
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6">
-          <rect x="2" y="9" width="14" height="7" rx="3" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <circle cx="6" cy="18" r="2.5" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <circle cx="14" cy="18" r="2.5" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M5 9l1-2h6l1 2" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M7 7l1 1h4" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      )
+      return <Car className="w-6 h-6 text-orange-500" />
     } else if (vehicleType.includes('vélo') || vehicleType.includes('velo') || vehicleType.includes('bike') || vehicleType.includes('bicyclette')) {
-      // VÉLO - cadre avec deux roues et guidon
-      return (
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6">
-          <path d="M7 12v4M12 8v8M17 12v4" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <circle cx="7" cy="17" r="2.5" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <circle cx="17" cy="17" r="2.5" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M7 17l3-7h4" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M10 10l2-2" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M14 10h-2" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      )
+      return <BsBicycle className="w-6 h-6 text-orange-500" />
     } else {
       // Par défaut, voiture
-      return (
-        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-6 h-6">
-          <rect x="2" y="9" width="14" height="7" rx="3" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <circle cx="6" cy="18" r="2.5" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <circle cx="14" cy="18" r="2.5" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M5 9l1-2h6l1 2" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M7 7l1 1h4" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-      )
+      return <Car className="w-6 h-6 text-orange-500" />
     }
   }
 
@@ -340,37 +351,27 @@ export default function SuperAdminDashboard() {
     })
   }
 
-  const sidebarItems = [
-    { id: 'dashboard' as const, icon: LayoutDashboard, label: 'Dashboard' },
-    { id: 'registrations' as const, icon: UserCheck, label: 'Inscriptions' },
-    { id: 'accounts' as const, icon: ShieldCheck, label: 'Comptes' },
-  ]
-
   return (
     <div className="min-h-screen flex bg-background">
-      {/* Sidebar - Desktop only */}
-      <aside className="hidden md:flex fixed left-0 top-0 z-40 h-screen bg-card border-r transition-all duration-300 flex-col">
+      {/* Sidebar - Vertical à gauche, toujours visible */}
+      <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-orange-600 dark:bg-orange-700 flex flex-col border-r border-orange-700">
         {/* Logo */}
-        <div className="h-16 flex items-center justify-between px-4 border-b">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-amber-600 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Package className="w-6 h-6 text-white" />
+        <div className="h-20 flex items-center justify-center px-4 border-b border-orange-700">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+              <Package className="w-6 h-6 text-orange-600" />
             </div>
-            <h1 className="text-lg font-bold">
-              TiiB<span className="text-orange-500">n</span>Pick
-            </h1>
+            <div className="text-white">
+              <h1 className="text-lg font-bold leading-tight">
+                TiiB<span className="text-orange-200">n</span>Pick
+              </h1>
+              <p className="text-xs text-orange-100">Super Admin</p>
+            </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-          >
-            <X className={cn("w-4 h-4 transition-transform", !sidebarOpen && "rotate-180")} />
-          </Button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           {sidebarItems.map((item) => {
             const Icon = item.icon
             const isActive = activeView === item.id
@@ -379,58 +380,64 @@ export default function SuperAdminDashboard() {
                 key={item.id}
                 onClick={() => setActiveView(item.id)}
                 className={cn(
-                  'w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-                  'hover:bg-accent hover:text-accent-foreground',
-                  isActive ? 'bg-orange-50 text-orange-700 font-medium' : 'text-muted-foreground'
+                  'w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all',
+                  isActive 
+                    ? 'bg-white text-orange-600 font-semibold shadow-md' 
+                    : 'text-white hover:bg-orange-500/50 hover:text-white'
                 )}
               >
                 <Icon className="w-5 h-5 flex-shrink-0" />
-                {sidebarOpen && <span>{item.label}</span>}
+                <span>{item.label}</span>
               </button>
             )
           })}
         </nav>
 
         {/* User Section */}
-        <div className="p-4 border-t">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold flex-shrink-0">
+        <div className="p-4 border-t border-orange-700">
+          <div className="flex items-center gap-3 text-white">
+            <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center font-semibold flex-shrink-0">
               {superAdminName.split(' ').map(n => n[0]).join('')}
             </div>
-            {sidebarOpen && (
-              <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">{superAdminName}</p>
-                <p className="text-xs text-muted-foreground truncate">admin@tiibnpick.com</p>
-              </div>
-            )}
-            {sidebarOpen && (
-              <Button variant="ghost" size="icon" className="flex-shrink-0">
-                <LogOut className="w-4 h-4" />
-              </Button>
-            )}
+            <div className="flex-1 min-w-0">
+              <p className="font-medium truncate text-sm">{superAdminName}</p>
+              <p className="text-xs text-orange-100 truncate">admin@tiibnpick.com</p>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="flex-shrink-0 text-white hover:text-white hover:bg-orange-500/50"
+              onClick={handleLogout}
+            >
+              <LogOut className="w-4 h-4" />
+            </Button>
           </div>
         </div>
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-h-screen md:ml-[256px]">
-        {/* Top Bar - Mobile only */}
-        <header className="md:hidden h-14 border-b bg-card sticky top-0 z-30 flex items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-amber-600 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Package className="w-5 h-5 text-white" />
-            </div>
-            <h1 className="text-base font-bold">
-              TiiB<span className="text-orange-500">n</span>Pick
-            </h1>
+      <div className="flex-1 flex flex-col min-h-screen ml-64">
+        {/* Top Bar */}
+        <header className="h-16 border-b bg-white dark:bg-gray-800 sticky top-0 z-30 flex items-center justify-between px-6">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+              {activeView === 'dashboard' && 'Dashboard'}
+              {activeView === 'registrations' && 'Demandes d\'inscription'}
+              {activeView === 'accounts' && 'Gestion des comptes'}
+            </h2>
           </div>
-          <Button variant="outline" size="sm" onClick={() => { fetchRegistrations(); fetchAccounts() }}>
-            <RefreshCw className="w-4 h-4" />
+          <Button 
+            onClick={() => { fetchRegistrations(); fetchAccounts() }}
+            variant="outline"
+            size="sm"
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Actualiser
           </Button>
         </header>
 
         {/* Content */}
-        <main className="flex-1 p-4 md:p-6 pb-20 md:pb-6">
+        <main className="flex-1 p-6 overflow-auto">
           {/* Dashboard View */}
           {activeView === 'dashboard' && (
             <div className="space-y-6">
@@ -443,12 +450,12 @@ export default function SuperAdminDashboard() {
 
               {/* Stats Cards */}
               <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
-                <Card className="hover:shadow-md transition-shadow">
+                <Card className="hover:shadow-md transition-shadow flex flex-col">
                   <CardHeader className="pb-3 px-4 py-3">
-                    <CardDescription className="text-[10px] md:text-xs">En attente</CardDescription>
+                    <CardDescription className="text-[10px] md:text-xs text-black">En attente</CardDescription>
                     <CardTitle className="text-xl md:text-2xl text-orange-600">{stats.pendingRegistrations}</CardTitle>
                   </CardHeader>
-                  <CardContent className="px-4 pb-4">
+                  <CardContent className="px-4 pb-4 mt-auto">
                     <div className="flex items-center text-xs text-muted-foreground">
                       <Clock className="w-3 h-3 mr-1" />
                       Inscriptions
@@ -456,12 +463,12 @@ export default function SuperAdminDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card className="hover:shadow-md transition-shadow">
+                <Card className="hover:shadow-md transition-shadow flex flex-col">
                   <CardHeader className="pb-3 px-4 py-3">
-                    <CardDescription className="text-[10px] md:text-xs">Livreurs</CardDescription>
+                    <CardDescription className="text-[10px] md:text-xs text-black">Livreurs</CardDescription>
                     <CardTitle className="text-xl md:text-2xl text-green-600">{stats.activeDeliveryPersons}</CardTitle>
                   </CardHeader>
-                  <CardContent className="px-4 pb-4">
+                  <CardContent className="px-4 pb-4 mt-auto">
                     <div className="flex items-center text-xs text-muted-foreground">
                       <Users className="w-3 h-3 mr-1" />
                       Actifs
@@ -469,26 +476,26 @@ export default function SuperAdminDashboard() {
                   </CardContent>
                 </Card>
 
-                <Card className="hover:shadow-md transition-shadow">
+                <Card className="hover:shadow-md transition-shadow flex flex-col">
                   <CardHeader className="pb-3 px-4 py-3">
-                    <CardDescription className="text-[10px] md:text-xs">Suspendus</CardDescription>
+                    <CardDescription className="text-[10px] md:text-xs text-black">Suspendus</CardDescription>
                     <CardTitle className="text-xl md:text-2xl text-orange-600">{stats.suspendedAccounts}</CardTitle>
                   </CardHeader>
-                  <CardContent className="px-4 pb-4">
+                  <CardContent className="px-4 pb-4 mt-auto">
                     <div className="flex items-center text-xs text-muted-foreground">
-                      <AlertTriangle className="w-3 h-3 mr-1" />
+                      <AlertTriangle className="w-4 h-4 mr-1" />
                       Comptes
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="hover:shadow-md transition-shadow lg:block">
+                <Card className="hover:shadow-md transition-shadow lg:block flex flex-col">
                   <CardHeader className="pb-3 px-4 py-3">
-                    <CardDescription className="text-xs">Révoqués</CardDescription>
+                    <CardDescription className="text-xs text-black">Révoqués</CardDescription>
                     <CardTitle className="text-2xl text-red-600">{stats.revokedAccounts}</CardTitle>
                   </CardHeader>
-                  <CardContent className="px-4 pb-4">
-                    <div className="flex items-center text-sm text-muted-foreground">
+                  <CardContent className="px-4 pb-4 mt-auto">
+                    <div className="flex items-center text-xs text-muted-foreground">
                       <Ban className="w-4 h-4 mr-1" />
                       Comptes
                     </div>
@@ -543,185 +550,237 @@ export default function SuperAdminDashboard() {
                   </div>
                 </div>
               ) : (
-                registrationRequests.map((request) => (
-                  <Card key={request.id} className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-4">
-                        {/* Vehicle Icon */}
-                        <div className="flex-shrink-0">
-                          {getVehicleIcon(request.vehicleType)}
-                        </div>
+                <div className="space-y-2">
+                  {registrationRequests.map((request) => (
+                    <Card
+                      key={request.id}
+                      onClick={() => setSelectedRequest(request)}
+                      className="hover:shadow-md transition-colors cursor-pointer"
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between gap-4">
+                          {/* Left side - Vehicle icon and info */}
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            {/* Vehicle Icon */}
+                            <div className="flex-shrink-0">
+                              {getVehicleIcon(request.vehicleType)}
+                            </div>
 
-                        {/* Driver Info */}
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-base md:text-lg">{request.name}</div>
-                          <div className="text-xs text-muted-foreground">{request.vehicleBrand} {request.vehicleModel}</div>
-                        </div>
+                            {/* Name and Vehicle Info */}
+                            <div className="flex-1 min-w-0">
+                              <div className="font-semibold text-sm truncate">{request.name}</div>
+                              <div className="text-xs text-gray-600 truncate">
+                                {request.vehicleBrand} {request.vehicleModel}
+                              </div>
+                            </div>
+                          </div>
 
-                        {/* License Plate */}
-                        <div className="flex-shrink-0">
-                          <div className="font-bold text-xs text-orange-600">{request.vehicleRegNumber}</div>
+                          {/* Right side - License plate */}
+                          <div className="flex-shrink-0">
+                            <div className="font-mono text-lg font-bold text-orange-600">
+                              {request.vehicleRegNumber}
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )))}
-              </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
           )}
 
           {/* Accounts View */}
           {activeView === 'accounts' && (
-            <Card>
-              <CardHeader>
-                <div className="flex flex-col gap-3">
+            <div className="space-y-4">
+              {/* Filtres */}
+              <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Filtre par type de compte */}
                   <div>
-                    <CardTitle className="text-lg md:text-xl">Gestion des comptes</CardTitle>
-                    <CardDescription>Gérez tous les comptes utilisateurs (suspendre, révoquer)</CardDescription>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Type de compte
+                    </label>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setAccountTypeFilter('all')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          accountTypeFilter === 'all'
+                            ? 'bg-orange-600 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        Tous ({accounts.length})
+                      </button>
+                      <button
+                        onClick={() => setAccountTypeFilter('DELIVERY')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          accountTypeFilter === 'DELIVERY'
+                            ? 'bg-orange-600 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        Livreurs ({accounts.filter(a => a.role === 'DELIVERY').length})
+                      </button>
+                      <button
+                        onClick={() => setAccountTypeFilter('CLIENT')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          accountTypeFilter === 'CLIENT'
+                            ? 'bg-orange-600 text-white'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        Clients ({accounts.filter(a => a.role === 'CLIENT').length})
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Badge variant="outline" className="text-xs md:text-sm">
-                      {accounts.length} comptes
-                    </Badge>
+
+                  {/* Barre de recherche */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                      Rechercher
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Nom, email..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    />
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="rounded-md border max-h-[600px] overflow-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Utilisateur</TableHead>
-                        <TableHead>Contact</TableHead>
-                        <TableHead className="hidden md:table-cell">Rôle</TableHead>
-                        <TableHead>Dernière activité</TableHead>
-                        <TableHead>Statut</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {loading ? (
-                        <TableRow>
-                          <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                            Chargement...
-                          </TableCell>
-                        </TableRow>
-                      ) : accounts.length === 0 ? (
-                        <TableRow>
-                          <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                            Aucun compte trouvé
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        accounts.map((account) => (
-                          <TableRow key={account.id}>
-                            <TableCell>
-                              <div>
-                                <div className="font-medium text-sm md:text-base">{account.name}</div>
-                                <div className="text-xs text-muted-foreground">
-                                  {formatDate(account.createdAt)}
-                                </div>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="space-y-1">
-                                <div className="flex items-center text-xs">
-                                  <Phone className="w-3 h-3 mr-1 text-muted-foreground" />
-                                  <span className="truncate block max-w-[120px]">{account.phone}</span>
-                                </div>
-                                <div className="flex items-center text-xs hidden sm:flex">
-                                  <Mail className="w-3 h-3 mr-1 text-muted-foreground" />
-                                  <span className="truncate block max-w-[120px]">{account.email}</span>
-                                </div>
-                              </div>
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                              {getRoleBadge(account.role)}
-                            </TableCell>
-                            <TableCell className="hidden md:table-cell">
-                              {account.lastActivityAt ? (
-                                <span className="text-xs text-muted-foreground">{formatDate(account.lastActivityAt)}</span>
-                              ) : (
-                                <span className="text-xs text-muted-foreground">Jamais</span>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              {getStatusBadge(account.status)}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              {account.status === 'ACTIVE' && (
-                                <div className="flex justify-end gap-2">
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => handleSuspendAccount(account)}
-                                    className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
-                                  >
-                                    <AlertTriangle className="w-4 h-4" />
-                                  </Button>
-                                  <Button
-                                    size="sm"
-                                    onClick={() => handleRevokeAccount(account)}
-                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                  >
-                                    <Ban className="w-4 h-4" />
-                                  </Button>
-                                </div>
-                              )}
-                              {account.status === 'SUSPENDED' && (
-                                <Button
-                                  size="sm"
-                                  onClick={() => handleRevokeAccount(account)}
-                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                >
-                                  <Ban className="w-4 h-4" />
-                                </Button>
-                              )}
-                            </TableCell>
+              </div>
+
+              {/* Tableau des comptes */}
+              <Card>
+                <CardHeader>
+                  <div className="flex flex-col gap-3">
+                    <div>
+                      <CardTitle className="text-lg md:text-xl">Gestion des comptes</CardTitle>
+                      <CardDescription>Gérez les comptes utilisateurs (suspendre, révoquer)</CardDescription>
+                    </div>
+                    <div className="flex gap-2">
+                      <Badge variant="outline" className="text-xs md:text-sm">
+                        {getFilteredAccounts().length} compte{getFilteredAccounts().length !== 1 ? 's' : ''}
+                      </Badge>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="rounded-md border max-h-[600px] overflow-auto">
+                    {getFilteredAccounts().length === 0 ? (
+                      <div className="p-8 text-center text-muted-foreground">
+                        Aucun compte trouvé
+                      </div>
+                    ) : (
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Utilisateur</TableHead>
+                            <TableHead>Contact</TableHead>
+                            <TableHead className="hidden md:table-cell">Rôle</TableHead>
+                            <TableHead>Statut</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
                           </TableRow>
-                        )))}
-                      </TableBody>
-                    </Table>
-                </div>
-              </CardContent>
-            </Card>
+                        </TableHeader>
+                        <TableBody>
+                          {loading ? (
+                            <TableRow>
+                              <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                                Chargement...
+                              </TableCell>
+                            </TableRow>
+                          ) : (
+                            getFilteredAccounts().map((account) => (
+                              <TableRow key={account.id}>
+                                <TableCell>
+                                  <div>
+                                    <div className="font-medium text-sm md:text-base">{account.name}</div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {formatDate(account.createdAt)}
+                                    </div>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="space-y-1">
+                                    <div className="flex items-center text-xs">
+                                      <Phone className="w-3 h-3 mr-1 text-muted-foreground" />
+                                      <span className="truncate block max-w-[120px]">{account.phone}</span>
+                                    </div>
+                                    <div className="flex items-center text-xs hidden sm:flex">
+                                      <Mail className="w-3 h-3 mr-1 text-muted-foreground" />
+                                      <span className="truncate block max-w-[120px]">{account.email}</span>
+                                    </div>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="hidden md:table-cell">
+                                  {getRoleBadge(account.role)}
+                                </TableCell>
+                                <TableCell>
+                                  {getStatusBadge(account.status)}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  {account.status === 'ACTIVE' && (
+                                    <div className="flex justify-end gap-2">
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => handleSuspendAccount(account)}
+                                        className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                                      >
+                                        <AlertTriangle className="w-4 h-4" />
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        onClick={() => handleRevokeAccount(account)}
+                                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                      >
+                                        <Ban className="w-4 h-4" />
+                                      </Button>
+                                    </div>
+                                  )}
+                                  {account.status === 'SUSPENDED' && (
+                                    <div className="flex justify-end gap-2">
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        onClick={() => handleRestoreAccount(account)}
+                                        className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                      >
+                                        <CheckCircle className="w-4 h-4" />
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        onClick={() => handleRevokeAccount(account)}
+                                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                      >
+                                        <Ban className="w-4 h-4" />
+                                      </Button>
+                                    </div>
+                                  )}
+                                  {account.status === 'REVOKED' && (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => handleRestoreAccount(account)}
+                                      className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                    >
+                                      <CheckCircle className="w-4 h-4" />
+                                    </Button>
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            ))
+                          )}
+                        </TableBody>
+                      </Table>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
         </main>
-
-        {/* Bottom Navigation - Mobile only */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-gray-200 safe-area-bottom">
-          <div className="flex justify-between px-6 py-3">
-            <button
-              onClick={() => setActiveView('dashboard')}
-              className={cn(
-                'flex flex-col items-center gap-1 transition-colors flex-1',
-                activeView === 'dashboard' ? 'text-orange-600' : 'text-muted-foreground'
-              )}
-            >
-              <LayoutDashboard className="w-5 h-5" />
-              <span className="text-xs">Dashboard</span>
-            </button>
-            <button
-              onClick={() => setActiveView('registrations')}
-              className={cn(
-                'flex flex-col items-center gap-1 transition-colors flex-1',
-                activeView === 'registrations' ? 'text-orange-600' : 'text-muted-foreground'
-              )}
-            >
-              <UserCheck className="w-5 h-5" />
-              <span className="text-xs">Inscriptions</span>
-            </button>
-            <button
-              onClick={() => setActiveView('accounts')}
-              className={cn(
-                'flex flex-col items-center gap-1 transition-colors flex-1',
-                activeView === 'accounts' ? 'text-orange-600' : 'text-muted-foreground'
-              )}
-            >
-              <ShieldCheck className="w-5 h-5" />
-              <span className="text-xs">Comptes</span>
-            </button>
-          </div>
-        </nav>
 
         {/* Confirmation Dialog */}
         <AlertDialog open={actionDialog !== null}>
@@ -732,6 +791,7 @@ export default function SuperAdminDashboard() {
                 {actionDialog === 'reject' && 'Rejeter la demande'}
                 {actionDialog === 'suspend' && 'Suspendre le compte'}
                 {actionDialog === 'revoke' && 'Révoquer le compte'}
+                {actionDialog === 'restore' && 'Restaurer le compte'}
               </AlertDialogTitle>
             </AlertDialogHeader>
             <AlertDialogDescription>
@@ -739,6 +799,7 @@ export default function SuperAdminDashboard() {
               {actionDialog === 'reject' && selectedRequest && `Êtes-vous sûr de vouloir rejeter la demande de ${selectedRequest.name} ?`}
               {actionDialog === 'suspend' && selectedAccount && `Êtes-vous sûr de vouloir suspendre le compte de ${selectedAccount.name} ?`}
               {actionDialog === 'revoke' && selectedAccount && `Êtes-vous sûr de vouloir révoquer le compte de ${selectedAccount.name} ?`}
+              {actionDialog === 'restore' && selectedAccount && `Êtes-vous sûr de vouloir restaurer le compte de ${selectedAccount.name} ?`}
             </AlertDialogDescription>
             <AlertDialogFooter>
               <AlertDialogCancel>Annuler</AlertDialogCancel>
