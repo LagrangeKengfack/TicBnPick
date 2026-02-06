@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { User, UserCircle, Phone, Mail, Lock, MapPin, Upload, Camera, ChevronDown, ImageIcon, Car, Check } from 'lucide-react'
+import { User, UserCircle, Phone, Mail, Lock, MapPin, Upload, Camera, ChevronDown, ImageIcon, Car, Check, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { checkEmail, createClient, checkNationalId } from '../../services/clientService'
@@ -31,6 +31,8 @@ export default function LoginPage() {
   const [cniError, setCniError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
   const [isTermsAccepted, setIsTermsAccepted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [formData, setFormData] = useState({
     nom: '',
@@ -225,7 +227,7 @@ export default function LoginPage() {
   // Step 1: Selection
   if (step === 1) {
     return (
-      <div className="min-h-screen flex flex-col bg-white">
+      <div className="min-h-screen flex flex-col bg-[#f5f0e6]">
         <main className="flex-1 flex flex-col items-center justify-center px-4 py-6 md:py-8">
           <div className="w-full max-w-md space-y-4 md:space-y-6">
 
@@ -296,13 +298,13 @@ export default function LoginPage() {
   const totalSteps = role === 'client' ? 3 : 4
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="min-h-screen flex flex-col bg-[#f5f0e6]">
       <main className="flex-1 flex flex-col items-start justify-start px-3 md:px-4 py-4 md:py-6 overflow-y-auto">
         <div className="w-full max-w-md mx-auto space-y-3 md:space-y-6">
 
           {/* Step Indicators */}
-          <div className="flex flex-col items-center gap-2 md:gap-4 sticky top-0 bg-white py-2 z-10">
-            <div className="flex items-center justify-center gap-1 md:gap-2">
+          <div className="flex flex-col items-center gap-2 md:gap-4 sticky top-0 bg-[#f5f0e6] py-2 z-10">
+            <div className="flex items-center justify-center gap-0">
               {Array.from({ length: totalSteps }).map((_, i) => (
                 <div key={i + 1} className="flex items-center">
                   <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border-2 border-orange-500 ${completedSteps.includes(i + 1) ? 'bg-orange-500' : step === i + 1 ? 'bg-orange-500' : 'bg-white'
@@ -315,7 +317,7 @@ export default function LoginPage() {
                       <span className="font-bold text-sm md:text-lg text-orange-500">{i + 1}</span>
                     )}
                   </div>
-                  {i < totalSteps - 1 && <div className="w-6 md:w-8 h-1 bg-white"></div>}
+                  {i < totalSteps - 1 && <div className={`w-6 md:w-8 h-1 ${completedSteps.includes(i + 1) ? 'bg-orange-500' : 'bg-white'}`}></div>}
                 </div>
               ))}
             </div>
@@ -433,12 +435,20 @@ export default function LoginPage() {
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-orange-500" />
                     <Input
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       placeholder="Votre mot de passe"
                       value={formData.motDePasse}
                       onChange={(e) => updateField('motDePasse', e.target.value)}
-                      className={`pl-9 md:pl-10 border-gray-300 focus:border-orange-500 text-sm md:text-base ${role === 'client' && fieldErrors.motDePasse ? 'border-red-500' : ''}`}
+                      className={`pl-9 md:pl-10 pr-10 border-gray-300 focus:border-orange-500 text-sm md:text-base ${role === 'client' && fieldErrors.motDePasse ? 'border-red-500' : ''}`}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-orange-500 hover:text-orange-600 transition-colors"
+                      aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                    >
+                      {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                    </button>
                   </div>
                   {role === 'client' && fieldErrors.motDePasse && <p className="text-red-500 text-xs mt-1">{fieldErrors.motDePasse}</p>}
                 </div>
@@ -448,12 +458,20 @@ export default function LoginPage() {
                   <div className="relative">
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-orange-500" />
                     <Input
-                      type="password"
+                      type={showConfirmPassword ? "text" : "password"}
                       placeholder="Confirmez votre mot de passe"
                       value={formData.confirmerMotDePasse}
                       onChange={(e) => updateField('confirmerMotDePasse', e.target.value)}
-                      className={`pl-9 md:pl-10 border-gray-300 focus:border-orange-500 text-sm md:text-base ${role === 'client' && fieldErrors.confirmerMotDePasse ? 'border-red-500' : ''}`}
+                      className={`pl-9 md:pl-10 pr-10 border-gray-300 focus:border-orange-500 text-sm md:text-base ${role === 'client' && fieldErrors.confirmerMotDePasse ? 'border-red-500' : ''}`}
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-orange-500 hover:text-orange-600 transition-colors"
+                      aria-label={showConfirmPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                    >
+                      {showConfirmPassword ? <Eye size={20} /> : <EyeOff size={20} />}
+                    </button>
                   </div>
                   {role === 'client' && fieldErrors.confirmerMotDePasse && <p className="text-red-500 text-xs mt-1">{fieldErrors.confirmerMotDePasse}</p>}
                 </div>
