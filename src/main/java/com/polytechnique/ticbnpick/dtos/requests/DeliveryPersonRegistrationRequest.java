@@ -18,17 +18,17 @@ import lombok.NoArgsConstructor;
 public class DeliveryPersonRegistrationRequest {
     @NotBlank(message = "Last name is required")
     private String lastName;
-    
+
     @NotBlank(message = "First name is required")
     private String firstName;
-    
+
     @NotBlank(message = "Phone is required")
     private String phone;
-    
+
     @NotBlank(message = "Email is required")
     @Email(message = "Email must be valid")
     private String email;
-    
+
     private String nationalId;
     private String photoCard;
     private String commercialRegister;
@@ -36,7 +36,7 @@ public class DeliveryPersonRegistrationRequest {
     private String nui;
     private Double commissionRate;
     private Double siret;
-    
+
     @NotBlank(message = "Password is required")
     private String password;
 
@@ -44,7 +44,8 @@ public class DeliveryPersonRegistrationRequest {
     private String plateNumber;
     private String logisticsType; // Enum value
     private String logisticsClass; // Enum value
-    private String logisticImage;
+    private String backPhoto;
+    private String frontPhoto;
     private Double tankCapacity;
     private Double luggageMaxCapacity;
     private Integer totalSeatNumber;

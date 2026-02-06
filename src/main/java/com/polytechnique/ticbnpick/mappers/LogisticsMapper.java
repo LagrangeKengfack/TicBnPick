@@ -24,9 +24,15 @@ public class LogisticsMapper {
             return null;
         }
         Logistics logistics = new Logistics();
-        logistics.setLogisticsType(request.getType());
+        logistics.setLogisticsType(request.getLogisticsType());
         logistics.setLogisticsClass(request.getLogisticsClass());
-        logistics.setPlateNumber(request.getLicensePlate());
+        logistics.setPlateNumber(request.getPlateNumber());
+        logistics.setBackPhoto(request.getBackPhoto());
+        logistics.setFrontPhoto(request.getFrontPhoto());
+        logistics.setLuggageMaxCapacity(request.getLuggageMaxCapacity());
+        logistics.setTankCapacity(request.getTankCapacity());
+        logistics.setTotalSeatNumber(request.getTotalSeatNumber());
+        logistics.setColor(request.getColor());
         return logistics;
     }
 }

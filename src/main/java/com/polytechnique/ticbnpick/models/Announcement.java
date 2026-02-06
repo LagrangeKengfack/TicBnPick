@@ -63,6 +63,21 @@ public class Announcement {
     @Column("recipient_number")
     private String recipientNumber;
 
+    @Column("recipient_email")
+    private String recipientEmail;
+
+    @Column("recipient_phone")
+    private String recipientPhone;
+
+    @Column("shipper_name")
+    private String shipperName;
+
+    @Column("shipper_email")
+    private String shipperEmail;
+
+    @Column("shipper_phone")
+    private String shipperPhone;
+
     @Column("amount")
     private Float amount;
 

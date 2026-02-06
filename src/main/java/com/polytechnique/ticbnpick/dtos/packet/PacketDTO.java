@@ -11,4 +11,5 @@ public class PacketDTO {
     private String photoPacket;
     private Boolean isPerishable;
     private Double thickness;
+    private String designation;
 }

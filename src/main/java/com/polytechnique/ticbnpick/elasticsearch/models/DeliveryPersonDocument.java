@@ -26,6 +26,22 @@ import java.util.UUID;
 @Document(indexName = "delivery-persons")
 public class DeliveryPersonDocument {
 
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @Id
     private UUID id;
 

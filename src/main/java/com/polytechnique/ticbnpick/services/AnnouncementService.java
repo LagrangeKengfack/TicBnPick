@@ -41,6 +41,7 @@ public class AnnouncementService {
         packet.setPhotoPacket(request.getPacket().getPhotoPacket());
         packet.setIsPerishable(request.getPacket().getIsPerishable());
         packet.setThickness(request.getPacket().getThickness());
+        packet.setDesignation(request.getPacket().getDesignation());
 
         return packetRepository.save(packet).flatMap(savedPacket -> {
             // 2. Save Pickup Address
@@ -57,11 +58,15 @@ public class AnnouncementService {
                     announcement.setDeliveryAddressId(savedDelivery.getId());
                     announcement.setTitle(request.getTitle());
                     announcement.setDescription(request.getDescription());
-                    // announcement.setPrice(request.getPrice()); // Removed
                     announcement.setStatus(AnnouncementStatus.PUBLISHED); // Default status
                     announcement.setCreatedAt(Instant.now());
                     announcement.setRecipientName(request.getRecipientName());
                     announcement.setRecipientNumber(request.getRecipientNumber());
+                    announcement.setRecipientEmail(request.getRecipientEmail());
+                    announcement.setRecipientPhone(request.getRecipientPhone());
+                    announcement.setShipperName(request.getShipperName());
+                    announcement.setShipperEmail(request.getShipperEmail());
+                    announcement.setShipperPhone(request.getShipperPhone());
                     announcement.setAmount(request.getAmount());
 
                     return announcementRepository.save(announcement)
@@ -114,11 +119,15 @@ public class AnnouncementService {
         response.setTitle(announcement.getTitle());
         response.setDescription(announcement.getDescription());
         response.setStatus(announcement.getStatus());
-        // response.setPrice(announcement.getPrice()); // Removed
         response.setCreatedAt(announcement.getCreatedAt());
         response.setUpdatedAt(announcement.getUpdatedAt());
         response.setRecipientName(announcement.getRecipientName());
         response.setRecipientNumber(announcement.getRecipientNumber());
+        response.setRecipientEmail(announcement.getRecipientEmail());
+        response.setRecipientPhone(announcement.getRecipientPhone());
+        response.setShipperName(announcement.getShipperName());
+        response.setShipperEmail(announcement.getShipperEmail());
+        response.setShipperPhone(announcement.getShipperPhone());
         response.setAmount(announcement.getAmount());
 
         response.setPickupAddress(mapToAddressDTO(pickup));
@@ -152,6 +161,7 @@ public class AnnouncementService {
         dto.setPhotoPacket(packet.getPhotoPacket());
         dto.setIsPerishable(packet.getIsPerishable());
         dto.setThickness(packet.getThickness());
+        dto.setDesignation(packet.getDesignation());
         return dto;
     }
 
@@ -163,9 +173,13 @@ public class AnnouncementService {
                     announcement.setDescription(request.getDescription());
                     announcement.setTitle(request.getTitle());
                     announcement.setDescription(request.getDescription());
-                    // announcement.setPrice(request.getPrice()); // Removed
                     announcement.setRecipientName(request.getRecipientName());
                     announcement.setRecipientNumber(request.getRecipientNumber());
+                    announcement.setRecipientEmail(request.getRecipientEmail());
+                    announcement.setRecipientPhone(request.getRecipientPhone());
+                    announcement.setShipperName(request.getShipperName());
+                    announcement.setShipperEmail(request.getShipperEmail());
+                    announcement.setShipperPhone(request.getShipperPhone());
                     announcement.setAmount(request.getAmount());
                     announcement.setUpdatedAt(Instant.now());
 
@@ -182,6 +196,7 @@ public class AnnouncementService {
                                             packet.setPhotoPacket(request.getPacket().getPhotoPacket());
                                             packet.setIsPerishable(request.getPacket().getIsPerishable());
                                             packet.setThickness(request.getPacket().getThickness());
+                                            packet.setDesignation(request.getPacket().getDesignation());
                                             return packetRepository.save(packet);
                                         }
                                         return Mono.just(packet);

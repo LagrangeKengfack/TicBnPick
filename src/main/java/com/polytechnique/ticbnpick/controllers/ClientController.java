@@ -24,6 +24,16 @@ public class ClientController {
         return clientService.createClient(clientDTO);
     }
 
+    @GetMapping("/check-email")
+    public Mono<Boolean> checkEmail(@RequestParam String email) {
+        return clientService.checkEmailExists(email);
+    }
+
+    @GetMapping("/check-national-id")
+    public Mono<Boolean> checkNationalId(@RequestParam String nationalId) {
+        return clientService.checkNationalIdExists(nationalId);
+    }
+
     @GetMapping
     public Flux<ClientResponseDTO> getAllClients() {
         return clientService.getAllClients();

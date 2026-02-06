@@ -133,4 +133,8 @@
         <validCheckSum>ANY</validCheckSum>
         <sqlFile path="db/changelog/create-announcement-subscription.sql" relativeToChangelogFile="false"/>
     </changeSet>
+    <changeSet id="020-update-logistic-packet-announcement" author="TicBnPickTeam">
+        <validCheckSum>ANY</validCheckSum>
+        <sqlFile path="db/changelog/update-schema-logistic-packet-announcement.sql" relativeToChangelogFile="false"/>
+    </changeSet>
 </databaseChangeLog>

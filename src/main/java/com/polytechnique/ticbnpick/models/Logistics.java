@@ -65,6 +65,9 @@ public class Logistics {
     @Column("color")
     private String color;
 
-    @Column("logistic_image")
-    private String logisticImage;
+    @Column("back_photo")
+    private String backPhoto;
+
+    @Column("front_photo")
+    private String frontPhoto;
 }

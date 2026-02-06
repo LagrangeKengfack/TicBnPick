@@ -51,4 +51,7 @@ public class Packet {
 
     @Column("thickness")
     private Double thickness;
+
+    @Column("designation")
+    private String designation;
 }

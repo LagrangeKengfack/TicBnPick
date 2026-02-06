@@ -31,7 +31,14 @@ public class SecurityConfig {
                                                 .pathMatchers("/api/auth/**").permitAll()
                                                 .pathMatchers(HttpMethod.POST, "/api/clients").permitAll() // Allow
                                                                                                            // registration
+                                                .pathMatchers(HttpMethod.GET, "/api/clients/check-email").permitAll() // Allow
+                                                                                                                      // email
+                                                .pathMatchers(HttpMethod.GET, "/api/clients/check-national-id")
+                                                .permitAll() // Allow CNI check
                                                 .pathMatchers("/actuator/**").permitAll()
+                                                .pathMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
+                                                                "/webjars/**")
+                                                .permitAll()
                                                 .pathMatchers("/api/admin/**").authenticated()
                                                 .anyExchange().authenticated())
                                 .build();

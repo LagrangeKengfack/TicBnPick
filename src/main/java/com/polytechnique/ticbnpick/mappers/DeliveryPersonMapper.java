@@ -15,7 +15,8 @@ import org.springframework.stereotype.Component;
 /**
  * Mapper for DeliveryPerson entities and DTOs.
  *
- * <p>Provides transformation methods between registration request DTOs
+ * <p>
+ * Provides transformation methods between registration request DTOs
  * and entity objects for Person, DeliveryPerson, Logistics, and Address.
  *
  * @author Kengfack Lagrange
@@ -84,7 +85,11 @@ public class DeliveryPersonMapper {
         if (request.getLogisticsClass() != null) {
             logistics.setLogisticsClass(LogisticsClass.fromValue(request.getLogisticsClass()));
         }
-        logistics.setLogisticImage(request.getLogisticImage());
+        if (request.getLogisticsClass() != null) {
+            logistics.setLogisticsClass(LogisticsClass.fromValue(request.getLogisticsClass()));
+        }
+        logistics.setBackPhoto(request.getBackPhoto());
+        logistics.setFrontPhoto(request.getFrontPhoto());
         logistics.setTankCapacity(request.getTankCapacity());
         logistics.setLuggageMaxCapacity(request.getLuggageMaxCapacity());
         logistics.setTotalSeatNumber(request.getTotalSeatNumber());
@@ -116,7 +121,8 @@ public class DeliveryPersonMapper {
      * Maps a DeliveryPerson and Person to a registration response.
      *
      * @param deliveryPerson the delivery person entity
-     * @param person the person entity (unused but available for future expansion)
+     * @param person         the person entity (unused but available for future
+     *                       expansion)
      * @return the registration response with ID and status
      */
     public DeliveryPersonRegistrationResponse toRegistrationResponse(DeliveryPerson deliveryPerson, Person person) {
@@ -125,15 +131,14 @@ public class DeliveryPersonMapper {
         }
         return new DeliveryPersonRegistrationResponse(
                 deliveryPerson.getId(),
-                deliveryPerson.getStatus() != null ? deliveryPerson.getStatus().toString() : null
-        );
+                deliveryPerson.getStatus() != null ? deliveryPerson.getStatus().toString() : null);
     }
 
     /**
      * Maps a DeliveryPerson and Person to a details response.
      *
      * @param deliveryPerson the delivery person entity
-     * @param person the person entity
+     * @param person         the person entity
      * @return the detailed response DTO with all relevant fields
      */
     public DeliveryPersonDetailsResponse toDetailsResponse(DeliveryPerson deliveryPerson, Person person) {
