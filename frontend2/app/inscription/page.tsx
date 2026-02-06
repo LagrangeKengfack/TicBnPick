@@ -10,11 +10,15 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { User, UserCircle, Phone, Mail, Lock, MapPin, Upload, Camera, ChevronDown, ImageIcon, Car, Check } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { checkEmail, createClient, checkNationalId } from '../../services/clientService'
 
 type Step = 1 | 2 | 3 | 4
 type Role = 'client' | 'livreur' | null
 
 export default function LoginPage() {
+
+  const router = useRouter()
   const [step, setStep] = useState<Step>(1)
   const [role, setRole] = useState<Role>(null)
   const [completedSteps, setCompletedSteps] = useState<number[]>([])
@@ -23,7 +27,11 @@ export default function LoginPage() {
   const [photoCniVerso, setPhotoCniVerso] = useState<File | null>(null)
   const [photoVehiculeAvant, setPhotoVehiculeAvant] = useState<File | null>(null)
   const [photoVehiculeArriere, setPhotoVehiculeArriere] = useState<File | null>(null)
-  
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [cniError, setCniError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string }>({});
+  const [isTermsAccepted, setIsTermsAccepted] = useState(false);
+
   const [formData, setFormData] = useState({
     nom: '',
     prenom: '',
@@ -64,7 +72,93 @@ export default function LoginPage() {
     }
   }
 
-  const goNext = () => {
+  const validateStep2 = () => {
+    const errors: { [key: string]: string } = {};
+    let isValid = true;
+
+    if (!formData.nom.trim()) {
+      errors.nom = "Le nom est requis";
+      isValid = false;
+    }
+    if (!formData.prenom.trim()) {
+      errors.prenom = "Le prénom est requis";
+      isValid = false;
+    }
+    if (!formData.telephone.trim()) {
+      errors.telephone = "Le téléphone est requis";
+      isValid = false;
+    } else if (!/^6\d{8}$/.test(formData.telephone)) {
+      errors.telephone = "Le téléphone doit commencer par 6 et contenir 9 chiffres";
+      isValid = false;
+    }
+    if (!formData.email.trim()) {
+      errors.email = "L'email est requis";
+      isValid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = "Format d'email invalide";
+      isValid = false;
+    }
+    if (!formData.motDePasse) {
+      errors.motDePasse = "Le mot de passe est requis";
+      isValid = false;
+    }
+    if (!formData.confirmerMotDePasse) {
+      errors.confirmerMotDePasse = "La confirmation est requise";
+      isValid = false;
+    } else if (formData.motDePasse !== formData.confirmerMotDePasse) {
+      errors.confirmerMotDePasse = "Les mots de passe ne correspondent pas";
+      isValid = false;
+    }
+
+    if (!formData.numeroCNI.trim()) {
+      errors.numeroCNI = "Le numéro de CNI est requis";
+      isValid = false;
+    }
+
+
+    setFieldErrors(errors);
+    return isValid;
+  }
+
+  const goNext = async () => {
+    if (step === 2 && role === 'client') {
+      if (!validateStep2()) {
+        return;
+      }
+
+      // Validate email before proceeding
+      if (formData.email) {
+        try {
+          const exists = await checkEmail(formData.email);
+          if (exists) {
+            setEmailError("Cet email est déjà utilisé.");
+            return; // Stop here
+          }
+          setEmailError(null); // Clear error if valid
+        } catch (err) {
+          console.error("Error checking email", err);
+          setEmailError("Erreur lors de la vérification de l'email.");
+          return;
+        }
+      }
+
+      // Validate CNI before proceeding
+      if (formData.numeroCNI) {
+        try {
+          const exists = await checkNationalId(formData.numeroCNI);
+          if (exists) {
+            setCniError("Ce numéro de CNI est déjà utilisé.");
+            return; // Stop here
+          }
+          setCniError(null);
+        } catch (err) {
+          console.error("Error checking CNI", err);
+          setCniError("Erreur lors de la vérification du CNI.");
+          return;
+        }
+      }
+    }
+
     if (role === 'livreur' && step < 4) {
       setCompletedSteps([...completedSteps, step])
       setStep((step + 1) as Step)
@@ -77,9 +171,21 @@ export default function LoginPage() {
   }
 
   const updateField = (field: string, value: string) => {
-    if (field === 'telephone' || field === 'numeroCNI') {
-      const digitsOnly = value.replace(/\D/g, '').slice(0, 9)
+    if (field === 'telephone') {
+      let digitsOnly = value.replace(/\D/g, '').slice(0, 9)
+      // Force start with 6 if user types anything else at start
+      if (digitsOnly.length > 0 && !digitsOnly.startsWith('6')) {
+        // If user typed '6' it's fine. If they typed '1', replace with '6' or block?
+        // User said "forcé cela sur l'interface". Let's handle it by auto-prefixing or validation.
+        // Simpler to just enforce strictly in validation and maybe prevent non-6 start if possible, 
+        // but simple replace is often jarring. 
+        // Let's just allow digits but validation handles it.
+        // Actually, let's try to be smart.
+      }
       setFormData({ ...formData, [field]: digitsOnly })
+    } else if (field === 'numeroCNI') {
+      // No length limit, just string
+      setFormData({ ...formData, [field]: value })
     } else if (field === 'numeroNINE') {
       const valueUpper = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12)
       setFormData({ ...formData, [field]: valueUpper })
@@ -122,7 +228,7 @@ export default function LoginPage() {
       <div className="min-h-screen flex flex-col bg-white">
         <main className="flex-1 flex flex-col items-center justify-center px-4 py-6 md:py-8">
           <div className="w-full max-w-md space-y-4 md:space-y-6">
-            
+
             <div className="flex items-center justify-center">
               <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center">
                 <span className="text-white font-bold text-lg">1</span>
@@ -134,7 +240,7 @@ export default function LoginPage() {
             </h2>
 
             <div className="space-y-3 md:space-y-4 pt-2">
-              <Card 
+              <Card
                 className="cursor-pointer border-2 border-gray-200 hover:border-orange-400 transition-all active:scale-95"
                 onClick={selectClient}
               >
@@ -151,7 +257,7 @@ export default function LoginPage() {
                 </CardContent>
               </Card>
 
-              <Card 
+              <Card
                 className="cursor-pointer border-2 border-gray-200 hover:border-orange-400 transition-all active:scale-95"
                 onClick={selectLivreur}
               >
@@ -193,15 +299,14 @@ export default function LoginPage() {
     <div className="min-h-screen flex flex-col bg-white">
       <main className="flex-1 flex flex-col items-start justify-start px-3 md:px-4 py-4 md:py-6 overflow-y-auto">
         <div className="w-full max-w-md mx-auto space-y-3 md:space-y-6">
-          
+
           {/* Step Indicators */}
           <div className="flex flex-col items-center gap-2 md:gap-4 sticky top-0 bg-white py-2 z-10">
             <div className="flex items-center justify-center gap-1 md:gap-2">
               {Array.from({ length: totalSteps }).map((_, i) => (
                 <div key={i + 1} className="flex items-center">
-                  <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border-2 border-orange-500 ${
-                    completedSteps.includes(i + 1) ? 'bg-orange-500' : step === i + 1 ? 'bg-orange-500' : 'bg-white'
-                  }`}>
+                  <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border-2 border-orange-500 ${completedSteps.includes(i + 1) ? 'bg-orange-500' : step === i + 1 ? 'bg-orange-500' : 'bg-white'
+                    }`}>
                     {completedSteps.includes(i + 1) ? (
                       <Check className="w-4 h-4 md:w-5 md:h-5 text-white" />
                     ) : step === i + 1 ? (
@@ -214,25 +319,25 @@ export default function LoginPage() {
                 </div>
               ))}
             </div>
-            
+
             {step === 2 && (
               <h2 className="text-base md:text-lg font-medium text-gray-800 text-center leading-relaxed">
                 Veuillez remplir vos informations
               </h2>
             )}
-            
+
             {step === 3 && role === 'client' && (
               <h2 className="text-base md:text-lg font-medium text-gray-800 text-center leading-relaxed">
                 Finalisation
               </h2>
             )}
-            
+
             {step === 3 && role === 'livreur' && (
               <h2 className="text-base md:text-lg font-medium text-gray-800 text-center leading-relaxed">
                 Coordonnées
               </h2>
             )}
-            
+
             {step === 4 && role === 'livreur' && (
               <h2 className="text-base md:text-lg font-medium text-gray-800 text-center leading-relaxed">
                 Informations sur le véhicule
@@ -253,9 +358,10 @@ export default function LoginPage() {
                       placeholder="Votre nom"
                       value={formData.nom}
                       onChange={(e) => updateField('nom', e.target.value)}
-                      className="pl-9 md:pl-10 border-gray-300 focus:border-orange-500 text-sm md:text-base"
+                      className={`pl-9 md:pl-10 border-gray-300 focus:border-orange-500 text-sm md:text-base ${role === 'client' && fieldErrors.nom ? 'border-red-500' : ''}`}
                     />
                   </div>
+                  {role === 'client' && fieldErrors.nom && <p className="text-red-500 text-xs mt-1">{fieldErrors.nom}</p>}
                 </div>
 
                 <div className="space-y-1 md:space-y-2">
@@ -267,9 +373,10 @@ export default function LoginPage() {
                       placeholder="Votre prénom"
                       value={formData.prenom}
                       onChange={(e) => updateField('prenom', e.target.value)}
-                      className="pl-9 md:pl-10 border-gray-300 focus:border-orange-500 text-sm md:text-base"
+                      className={`pl-9 md:pl-10 border-gray-300 focus:border-orange-500 text-sm md:text-base ${role === 'client' && fieldErrors.prenom ? 'border-red-500' : ''}`}
                     />
                   </div>
+                  {role === 'client' && fieldErrors.prenom && <p className="text-red-500 text-xs mt-1">{fieldErrors.prenom}</p>}
                 </div>
 
                 <div className="space-y-1 md:space-y-2">
@@ -282,10 +389,11 @@ export default function LoginPage() {
                       value={formData.telephone}
                       onChange={(e) => updateField('telephone', e.target.value)}
                       maxLength={9}
-                      className="pl-9 md:pl-10 border-gray-300 focus:border-orange-500 text-sm md:text-base"
+                      className={`pl-9 md:pl-10 border-gray-300 focus:border-orange-500 text-sm md:text-base ${role === 'client' && fieldErrors.telephone ? 'border-red-500' : ''}`}
                     />
                   </div>
-                  <p className="text-xs text-gray-500">9 chiffres requis</p>
+                  {role === 'client' && fieldErrors.telephone && <p className="text-red-500 text-xs mt-1">{fieldErrors.telephone}</p>}
+                  {!(role === 'client' && fieldErrors.telephone) && <p className="text-xs text-gray-500">9 chiffres requis</p>}
                 </div>
 
                 <div className="space-y-1 md:space-y-2">
@@ -297,9 +405,27 @@ export default function LoginPage() {
                       placeholder="votre@email.com"
                       value={formData.email}
                       onChange={(e) => updateField('email', e.target.value)}
-                      className="pl-9 md:pl-10 border-gray-300 focus:border-orange-500 text-sm md:text-base"
+                      className={`pl-9 md:pl-10 border-gray-300 focus:border-orange-500 text-sm md:text-base ${role === 'client' && (fieldErrors.email || emailError) ? 'border-red-500' : ''}`}
                     />
                   </div>
+                  {role === 'client' && fieldErrors.email && <p className="text-red-500 text-xs mt-1">{fieldErrors.email}</p>}
+                  {role === 'client' && emailError && <p className="text-red-500 text-xs mt-1">{emailError}</p>}
+                </div>
+
+                <div className="space-y-1 md:space-y-2">
+                  <Label className="text-gray-700 text-xs md:text-sm font-medium">Numéro CNI</Label>
+                  <div className="relative">
+                    <Camera className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 md:h-5 md:w-5 text-orange-500" />
+                    <Input
+                      type="text"
+                      placeholder="Identifiant National"
+                      value={formData.numeroCNI}
+                      onChange={(e) => updateField('numeroCNI', e.target.value)}
+                      className={`pl-9 md:pl-10 border-gray-300 focus:border-orange-500 text-sm md:text-base ${role === 'client' && (fieldErrors.numeroCNI || cniError) ? 'border-red-500' : ''}`}
+                    />
+                  </div>
+                  {role === 'client' && fieldErrors.numeroCNI && <p className="text-red-500 text-xs mt-1">{fieldErrors.numeroCNI}</p>}
+                  {role === 'client' && cniError && <p className="text-red-500 text-xs mt-1">{cniError}</p>}
                 </div>
 
                 <div className="space-y-1 md:space-y-2">
@@ -311,9 +437,10 @@ export default function LoginPage() {
                       placeholder="Votre mot de passe"
                       value={formData.motDePasse}
                       onChange={(e) => updateField('motDePasse', e.target.value)}
-                      className="pl-9 md:pl-10 border-gray-300 focus:border-orange-500 text-sm md:text-base"
+                      className={`pl-9 md:pl-10 border-gray-300 focus:border-orange-500 text-sm md:text-base ${role === 'client' && fieldErrors.motDePasse ? 'border-red-500' : ''}`}
                     />
                   </div>
+                  {role === 'client' && fieldErrors.motDePasse && <p className="text-red-500 text-xs mt-1">{fieldErrors.motDePasse}</p>}
                 </div>
 
                 <div className="space-y-1 md:space-y-2">
@@ -325,9 +452,10 @@ export default function LoginPage() {
                       placeholder="Confirmez votre mot de passe"
                       value={formData.confirmerMotDePasse}
                       onChange={(e) => updateField('confirmerMotDePasse', e.target.value)}
-                      className="pl-9 md:pl-10 border-gray-300 focus:border-orange-500 text-sm md:text-base"
+                      className={`pl-9 md:pl-10 border-gray-300 focus:border-orange-500 text-sm md:text-base ${role === 'client' && fieldErrors.confirmerMotDePasse ? 'border-red-500' : ''}`}
                     />
                   </div>
+                  {role === 'client' && fieldErrors.confirmerMotDePasse && <p className="text-red-500 text-xs mt-1">{fieldErrors.confirmerMotDePasse}</p>}
                 </div>
 
                 <div className="flex gap-2 md:gap-3 pt-3 md:pt-4">
@@ -577,6 +705,8 @@ export default function LoginPage() {
                   <input
                     type="checkbox"
                     id="conditions"
+                    checked={isTermsAccepted}
+                    onChange={(e) => setIsTermsAccepted(e.target.checked)}
                     className="mt-1 w-4 h-4 md:w-5 md:h-5 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
                   />
                   <label htmlFor="conditions" className="text-xs md:text-sm text-gray-700 cursor-pointer">
@@ -594,8 +724,23 @@ export default function LoginPage() {
                     Précédent
                   </Button>
                   <Button
-                    className="flex-1 bg-orange-500 hover:bg-orange-600 h-12 md:h-auto text-sm md:text-base"
-                    onClick={() => console.log('Submit:', formData)}
+                    className={`flex-1 h-12 md:h-auto text-sm md:text-base ${isTermsAccepted
+                      ? 'bg-orange-500 hover:bg-orange-600'
+                      : 'bg-gray-300 cursor-not-allowed'
+                      }`}
+                    disabled={!isTermsAccepted}
+                    onClick={async () => {
+                      try {
+                        console.log('Submitting Client:', formData);
+                        const result = await createClient(formData);
+                        console.log('Client created:', result);
+                        alert('Compte créé avec succès !');
+                        router.push('/'); // Redirect to home page (http://10.2.8.89:3000)
+                      } catch (error) {
+                        console.error('Registration failed', error);
+                        alert('Erreur lors de la création du compte');
+                      }
+                    }}
                   >
                     Créer mon compte
                   </Button>

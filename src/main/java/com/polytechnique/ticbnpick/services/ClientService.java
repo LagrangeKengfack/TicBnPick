@@ -148,6 +148,20 @@ public class ClientService {
     }
 
     /**
+     * Checks if a client with the given email already exists.
+     *
+     * @param email email to check
+     * @return true if email exists, false otherwise
+     */
+    public Mono<Boolean> checkEmailExists(String email) {
+        return personRepository.existsByEmail(email);
+    }
+
+    public Mono<Boolean> checkNationalIdExists(String nationalId) {
+        return personRepository.existsByNationalId(nationalId);
+    }
+
+    /**
      * Maps Client and Person entities to ClientResponseDTO.
      *
      * @param client client entity

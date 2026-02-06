@@ -59,7 +59,7 @@ public class MatchingService {
                 .clientId(announcementDTO.getClientId())
                 .packet(announcementDTO.getPacket())
                 .createdAt(announcementDTO.getCreatedAt() != null ? announcementDTO.getCreatedAt() : Instant.now())
-                .price(announcementDTO.getPrice())
+                .amount(announcementDTO.getAmount())
                 .build();
 
         if (announcementDTO.getPickupAddress() != null

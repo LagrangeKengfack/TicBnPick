@@ -24,11 +24,15 @@ public class AnnouncementResponseDTO {
     private String title;
     private String description;
     private AnnouncementStatus status;
-    private Double price;
     private Instant createdAt;
     private Instant updatedAt;
     private String recipientName;
     private String recipientNumber;
+    private String recipientEmail;
+    private String recipientPhone;
+    private String shipperName;
+    private String shipperEmail;
+    private String shipperPhone;
     private Float amount;
 
     private AddressDTO pickupAddress;

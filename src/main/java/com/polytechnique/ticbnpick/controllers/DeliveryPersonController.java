@@ -28,7 +28,7 @@ public class DeliveryPersonController {
      * Sensitive fields trigger a pending update request.
      * Non-sensitive fields are updated immediately.
      *
-     * @param id the delivery person ID
+     * @param id      the delivery person ID
      * @param request the update request
      * @return 200 OK
      */
@@ -37,6 +37,8 @@ public class DeliveryPersonController {
             @PathVariable UUID id,
             @Valid @RequestBody DeliveryPersonUpdateRequest request) {
         return profileService.updateProfile(id, request)
-                .map(v -> ResponseEntity.ok().build());
+                .then(Mono.just(ResponseEntity.ok().<Void>build()))
+                .onErrorResume(org.springframework.web.server.ResponseStatusException.class,
+                        e -> Mono.just(ResponseEntity.status(e.getStatusCode()).build()));
     }
 }

@@ -21,22 +21,27 @@ import reactor.core.scheduler.Schedulers;
  * @author Kengfack Lagrange
  * @date 19/12/2025
  */
-@Slf4j
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 @RequiredArgsConstructor
 public class EmailService {
+
+    private static final Logger log = LoggerFactory.getLogger(EmailService.class);
 
     private final JavaMailSender emailSender;
 
     /**
      * Sends a simple email message synchronously.
      *
-     * <p>Constructs and sends an email using the configured JavaMailSender.
+     * <p>
+     * Constructs and sends an email using the configured JavaMailSender.
      * Errors are logged but not propagated to avoid breaking the main flow.
      *
-     * @param to the recipient's email address
+     * @param to      the recipient's email address
      * @param subject the subject of the email
-     * @param text the body text of the email
+     * @param text    the body text of the email
      */
     public void sendSimpleMessage(String to, String subject, String text) {
         try {
@@ -55,12 +60,13 @@ public class EmailService {
     /**
      * Sends a simple email message reactively.
      *
-     * <p>Wraps the blocking email send operation in a Mono that executes
+     * <p>
+     * Wraps the blocking email send operation in a Mono that executes
      * on the bounded elastic scheduler to avoid blocking the event loop.
      *
-     * @param to the recipient's email address
+     * @param to      the recipient's email address
      * @param subject the subject of the email
-     * @param text the body text of the email
+     * @param text    the body text of the email
      * @return a Mono&lt;Void&gt; signaling completion
      */
     public Mono<Void> sendSimpleMessageReactive(String to, String subject, String text) {
@@ -72,7 +78,8 @@ public class EmailService {
     /**
      * Sends a registration received notification email.
      *
-     * <p>Informs the delivery person that their registration request
+     * <p>
+     * Informs the delivery person that their registration request
      * has been received and is pending admin validation.
      *
      * @param to the recipient's email address
@@ -82,18 +89,18 @@ public class EmailService {
                 to,
                 "TicBnPick - Inscription reçue",
                 "Bonjour,\n\n" +
-                "Votre demande d'inscription en tant que livreur a bien été reçue.\n\n" +
-                "Votre compte est en attente de validation par notre équipe administrative.\n" +
-                "Un email vous sera envoyé lorsque votre demande aura été examinée.\n\n" +
-                "Cordialement,\n" +
-                "L'équipe TicBnPick"
-        );
+                        "Votre demande d'inscription en tant que livreur a bien été reçue.\n\n" +
+                        "Votre compte est en attente de validation par notre équipe administrative.\n" +
+                        "Un email vous sera envoyé lorsque votre demande aura été examinée.\n\n" +
+                        "Cordialement,\n" +
+                        "L'équipe TicBnPick");
     }
 
     /**
      * Sends an account approved notification email.
      *
-     * <p>Informs the delivery person that their account has been approved
+     * <p>
+     * Informs the delivery person that their account has been approved
      * and they can now access the platform.
      *
      * @param to the recipient's email address
@@ -103,43 +110,45 @@ public class EmailService {
                 to,
                 "TicBnPick - Compte approuvé",
                 "Bonjour,\n\n" +
-                "Félicitations ! Votre compte livreur a été approuvé.\n\n" +
-                "Vous pouvez maintenant vous connecter à l'application et commencer à effectuer des livraisons.\n\n" +
-                "Cordialement,\n" +
-                "L'équipe TicBnPick"
-        );
+                        "Félicitations ! Votre compte livreur a été approuvé.\n\n" +
+                        "Vous pouvez maintenant vous connecter à l'application et commencer à effectuer des livraisons.\n\n"
+                        +
+                        "Cordialement,\n" +
+                        "L'équipe TicBnPick");
     }
 
     /**
      * Sends an account rejected notification email.
      *
-     * <p>Informs the delivery person that their registration has been rejected,
+     * <p>
+     * Informs the delivery person that their registration has been rejected,
      * with an optional reason for the decision.
      *
-     * @param to the recipient's email address
+     * @param to     the recipient's email address
      * @param reason optional reason for rejection (may be null or empty)
      */
     public void sendAccountRejected(String to, String reason) {
-        String reasonText = (reason != null && !reason.isEmpty()) 
-                ? "\nRaison : " + reason + "\n" 
+        String reasonText = (reason != null && !reason.isEmpty())
+                ? "\nRaison : " + reason + "\n"
                 : "";
         sendSimpleMessage(
                 to,
                 "TicBnPick - Demande d'inscription refusée",
                 "Bonjour,\n\n" +
-                "Nous avons le regret de vous informer que votre demande d'inscription " +
-                "en tant que livreur n'a pas été approuvée.\n" +
-                reasonText +
-                "\nSi vous pensez qu'il s'agit d'une erreur, veuillez nous contacter.\n\n" +
-                "Cordialement,\n" +
-                "L'équipe TicBnPick"
-        );
+                        "Nous avons le regret de vous informer que votre demande d'inscription " +
+                        "en tant que livreur n'a pas été approuvée.\n" +
+                        reasonText +
+                        "\nSi vous pensez qu'il s'agit d'une erreur, veuillez nous contacter.\n\n" +
+                        "Cordialement,\n" +
+                        "L'équipe TicBnPick");
     }
 
     /**
      * Sends an account suspended notification email.
      *
-     * <p>Informs the delivery person that their account has been temporarily suspended.
+     * <p>
+     * Informs the delivery person that their account has been temporarily
+     * suspended.
      * Provides contact information for inquiries.
      *
      * @param to the recipient's email address
@@ -149,19 +158,20 @@ public class EmailService {
                 to,
                 "TicBnPick - Compte suspendu",
                 "Bonjour,\n\n" +
-                "Nous vous informons que votre compte livreur a été temporairement suspendu.\n\n" +
-                "Durant cette période, vous ne pourrez pas accéder aux fonctionnalités de l'application.\n\n" +
-                "Si vous pensez qu'il s'agit d'une erreur ou pour plus d'informations, " +
-                "veuillez contacter notre équipe support.\n\n" +
-                "Cordialement,\n" +
-                "L'équipe TicBnPick"
-        );
+                        "Nous vous informons que votre compte livreur a été temporairement suspendu.\n\n" +
+                        "Durant cette période, vous ne pourrez pas accéder aux fonctionnalités de l'application.\n\n" +
+                        "Si vous pensez qu'il s'agit d'une erreur ou pour plus d'informations, " +
+                        "veuillez contacter notre équipe support.\n\n" +
+                        "Cordialement,\n" +
+                        "L'équipe TicBnPick");
     }
 
     /**
      * Sends an account revoked notification email.
      *
-     * <p>Informs the delivery person that their account has been permanently deactivated.
+     * <p>
+     * Informs the delivery person that their account has been permanently
+     * deactivated.
      * This is a final status with no automatic reactivation.
      *
      * @param to the recipient's email address
@@ -171,11 +181,10 @@ public class EmailService {
                 to,
                 "TicBnPick - Compte révoqué",
                 "Bonjour,\n\n" +
-                "Nous vous informons que votre compte livreur a été définitivement révoqué.\n\n" +
-                "Cette décision est irrévocable et vous ne pourrez plus accéder à l'application.\n\n" +
-                "Si vous pensez qu'il s'agit d'une erreur, veuillez contacter notre équipe support.\n\n" +
-                "Cordialement,\n" +
-                "L'équipe TicBnPick"
-        );
+                        "Nous vous informons que votre compte livreur a été définitivement révoqué.\n\n" +
+                        "Cette décision est irrévocable et vous ne pourrez plus accéder à l'application.\n\n" +
+                        "Si vous pensez qu'il s'agit d'une erreur, veuillez contacter notre équipe support.\n\n" +
+                        "Cordialement,\n" +
+                        "L'équipe TicBnPick");
     }
 }

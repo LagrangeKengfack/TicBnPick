@@ -46,6 +46,6 @@ public class AnnouncementDocument {
     @Field(type = FieldType.Date)
     private Instant createdAt;
 
-    @Field(type = FieldType.Double)
-    private Double price;
+    @Field(type = FieldType.Float)
+    private Float amount;
 }

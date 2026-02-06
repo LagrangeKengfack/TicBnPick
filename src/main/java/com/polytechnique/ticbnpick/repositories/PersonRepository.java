@@ -35,4 +35,5 @@ public interface PersonRepository extends ReactiveCrudRepository<Person, UUID> {
      * @return true if exists, false otherwise
      */
     Mono<Boolean> existsByEmail(String email);
+    Mono<Boolean> existsByNationalId(String nationalId);
 }

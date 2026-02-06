@@ -16,9 +16,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LogisticsCreateRequest {
-    private LogisticsType type;
+    private LogisticsType logisticsType;
     private LogisticsClass logisticsClass;
-    private String model;
-    private String licensePlate;
-    private Double maxLoad;
+    private String plateNumber;
+    private Double luggageMaxCapacity;
+    private String backPhoto;
+    private String frontPhoto;
+    private Double tankCapacity;
+    private Integer totalSeatNumber;
+    private String color;
 }

@@ -38,7 +38,8 @@ public class DeliveryPersonUpdateValidator {
                 request.getCommercialName() != null ||
                 request.getCommercialRegister() != null ||
                 request.getLogisticsType() != null ||
-                request.getLogisticImage() != null ||
+                request.getBackPhoto() != null ||
+                request.getFrontPhoto() != null ||
                 request.getPlateNumber() != null ||
                 request.getLogisticsClass() != null ||
                 request.getColor() != null ||

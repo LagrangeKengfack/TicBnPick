@@ -21,7 +21,8 @@ public class DeliveryPersonUpdateRequest {
     // Sensitive fields
     private String commercialRegister;
     private String logisticsType;
-    private String logisticImage;
+    private String backPhoto;
+    private String frontPhoto;
 
     // Logistics fields
     private String plateNumber;

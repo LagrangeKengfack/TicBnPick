@@ -16,28 +16,28 @@ import java.util.UUID;
 @SpringBootTest
 public class ElasticsearchIntegrationTest {
 
-    @Autowired
-    private AnnouncementSearchRepository announcementSearchRepository;
+        @Autowired
+        private AnnouncementSearchRepository announcementSearchRepository;
 
-    @Test
-    public void testSaveAndFindAnnouncement() {
-        UUID announcementId = UUID.randomUUID();
-        AnnouncementDocument doc = AnnouncementDocument.builder()
-                .id(announcementId)
-                .clientId(UUID.randomUUID())
-                .pickupLocation(new GeoPoint(48.8566, 2.3522)) // Paris
-                .deliveryLocation(new GeoPoint(45.7640, 4.8357)) // Lyon
-                .packet(new PacketDTO())
-                .createdAt(Instant.now())
-                .price(100.0)
-                .build();
+        @Test
+        public void testSaveAndFindAnnouncement() {
+                UUID announcementId = UUID.randomUUID();
+                AnnouncementDocument doc = AnnouncementDocument.builder()
+                                .id(announcementId)
+                                .clientId(UUID.randomUUID())
+                                .pickupLocation(new GeoPoint(48.8566, 2.3522)) // Paris
+                                .deliveryLocation(new GeoPoint(45.7640, 4.8357)) // Lyon
+                                .packet(new PacketDTO())
+                                .createdAt(Instant.now())
+                                .amount(100.0f)
+                                .build();
 
-        Mono<AnnouncementDocument> saveAndFind = announcementSearchRepository.save(doc)
-                .then(announcementSearchRepository.findById(announcementId));
+                Mono<AnnouncementDocument> saveAndFind = announcementSearchRepository.save(doc)
+                                .then(announcementSearchRepository.findById(announcementId));
 
-        StepVerifier.create(saveAndFind)
-                .expectNextMatches(foundDoc -> foundDoc.getId().equals(announcementId) &&
-                        foundDoc.getPickupLocation().getLat() == 48.8566)
-                .verifyComplete();
-    }
+                StepVerifier.create(saveAndFind)
+                                .expectNextMatches(foundDoc -> foundDoc.getId().equals(announcementId) &&
+                                                foundDoc.getPickupLocation().getLat() == 48.8566)
+                                .verifyComplete();
+        }
 }
